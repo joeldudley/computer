@@ -2,13 +2,13 @@ package hdlsimulator
 
 fun NotGate(): Pair<Gate, Gate> {
     val input = RegGate()
-    val output = NandGate()
+    val nand = NandGate()
 
-    input.outputs.add(output)
-    output.inputs.add(input)
-    output.inputs.add(input)
+    input.outputs.add(nand)
+    nand.input = input
+    nand.auxInput = input
 
-    return input to output
+    return input to nand
 }
 
 fun AndGate(): Pair<List<Gate>, Gate> {
@@ -19,11 +19,11 @@ fun AndGate(): Pair<List<Gate>, Gate> {
 
     input1.outputs.add(nand)
     input2.outputs.add(nand)
-    nand.inputs.add(input1)
-    nand.inputs.add(input2)
+    nand.input = input1
+    nand.auxInput = input2
 
     nand.outputs.add(notIn)
-    notIn.inputs.add(nand)
+    notIn.input = nand
 
     return listOf(input1, input2) to notOut
 }
@@ -36,14 +36,14 @@ fun OrGate(): Pair<List<Gate>, Gate> {
     val nand = NandGate()
 
     input1.outputs.add(not1In)
-    not1In.inputs.add(input1)
+    not1In.input = input1
     input2.outputs.add(not2In)
-    not2In.inputs.add(input2)
+    not2In.input = input2
 
     not1Out.outputs.add(nand)
-    nand.inputs.add(not1Out)
+    nand.input = not1Out
     not2Out.outputs.add(nand)
-    nand.inputs.add(not2Out)
+    nand.auxInput = not2Out
 
     return listOf(input1, input2) to nand
 }
