@@ -1,4 +1,4 @@
-package hdlsimulator
+package hdlsimulator.tokeniser
 
 internal class Tokeniser {
     fun tokenize(program: String): List<String> {
@@ -41,7 +41,7 @@ internal class Tokeniser {
                     }
                 }
 
-                '(', ')', '=' -> {
+                ';', '(', ')', '=' -> {
                     if (inWord) {
                         tokens.add(word)
                         inWord = false
@@ -51,7 +51,7 @@ internal class Tokeniser {
                     pos++
                 }
 
-                ',', ';', ' ', '\t', '\n', '\r' -> { // Non-word character.
+                ',', ' ', '\t', '\n', '\r' -> { // Non-word character.
                     if (inWord) {
                         tokens.add(word)
                         inWord = false

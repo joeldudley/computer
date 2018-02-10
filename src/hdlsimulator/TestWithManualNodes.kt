@@ -1,8 +1,8 @@
 package hdlsimulator
 
-fun NotNode(): Pair<Node, Node> {
-    val input = RegNode()
-    val output = NandNode()
+fun NotGate(): Pair<Gate, Gate> {
+    val input = RegGate()
+    val output = NandGate()
 
     input.outputs.add(output)
     output.inputs.add(input)
@@ -11,11 +11,11 @@ fun NotNode(): Pair<Node, Node> {
     return input to output
 }
 
-fun AndNode(): Pair<List<Node>, Node> {
-    val input1 = RegNode()
-    val input2 = RegNode()
-    val nand = NandNode()
-    val (notIn, notOut) = NotNode()
+fun AndGate(): Pair<List<Gate>, Gate> {
+    val input1 = RegGate()
+    val input2 = RegGate()
+    val nand = NandGate()
+    val (notIn, notOut) = NotGate()
 
     input1.outputs.add(nand)
     input2.outputs.add(nand)
@@ -28,12 +28,12 @@ fun AndNode(): Pair<List<Node>, Node> {
     return listOf(input1, input2) to notOut
 }
 
-fun OrNode(): Pair<List<Node>, Node> {
-    val input1 = RegNode()
-    val input2 = RegNode()
-    val (not1In, not1Out) = NotNode()
-    val (not2In, not2Out) = NotNode()
-    val nand = NandNode()
+fun OrGate(): Pair<List<Gate>, Gate> {
+    val input1 = RegGate()
+    val input2 = RegGate()
+    val (not1In, not1Out) = NotGate()
+    val (not2In, not2Out) = NotGate()
+    val nand = NandGate()
 
     input1.outputs.add(not1In)
     not1In.inputs.add(input1)
@@ -49,7 +49,7 @@ fun OrNode(): Pair<List<Node>, Node> {
 }
 
 fun notTest() {
-    val (in_, out) = NotNode()
+    val (in_, out) = NotGate()
 
     in_.value = false
     in_.eval()
@@ -69,7 +69,7 @@ fun notTest() {
 }
 
 fun andTest() {
-    val (ins, out) = AndNode()
+    val (ins, out) = AndGate()
     val (in1, in2) = ins[0] to ins[1]
 
     in1.value = false
@@ -98,7 +98,7 @@ fun andTest() {
 }
 
 fun orTest() {
-    val (ins, out) = OrNode()
+    val (ins, out) = OrGate()
     val (in1, in2) = ins[0] to ins[1]
 
     in1.value = false
