@@ -15,7 +15,7 @@ class RegGate : Gate() {
         } catch (e: UninitializedPropertyAccessException) {
 
         }
-        outputs.forEach { node -> node.eval() }
+        outputs.forEach { it.eval() }
     }
 }
 
@@ -24,6 +24,6 @@ class NandGate : Gate() {
 
     override fun eval() {
         value = !(input.value && auxInput.value)
-        outputs.forEach { node -> node.eval() }
+        outputs.forEach { it.eval() }
     }
 }

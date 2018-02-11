@@ -7,7 +7,6 @@ import hdlsimulator.parser.Node
 
 data class HookUps(val ins: Map<String, Gate>, val outs: Map<String, Gate>)
 
-// TODO: Test this - it was a first pass but it might work.
 class Generator {
     fun convertNodeToGates(chip: Node.Chip): HookUps {
         val ins = chip.ins.map { it to RegGate() }.toMap()
@@ -19,14 +18,19 @@ class Generator {
                     val nandGate = NandGate()
 
                     for (assignment in component.assignments) {
+                        val gate = ins[assignment.rhs] ?: outs[assignment.rhs]!!
                         when (assignment.lhs) {
                             "a" -> {
-                                ins[assignment.rhs]!!.outputs.add(nandGate.input)
-                                nandGate.input = ins[assignment.rhs]!!
+                                nandGate.input = gate
+                                gate.outputs.add(nandGate)
                             }
                             "b" -> {
-                                ins[assignment.rhs]!!.outputs.add(nandGate.auxInput)
-                                nandGate.auxInput = ins[assignment.rhs]!!
+                                nandGate.auxInput = gate
+                                gate.outputs.add(nandGate)
+                            }
+                            "out" -> {
+                                nandGate.outputs.add(gate)
+                                gate.input = nandGate
                             }
                         }
                     }

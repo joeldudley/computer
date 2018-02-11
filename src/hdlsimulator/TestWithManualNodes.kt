@@ -127,5 +127,5 @@ fun orTest() {
 }
 
 fun main(args: Array<String>) {
-    orTest()
+    notTest()
 }
