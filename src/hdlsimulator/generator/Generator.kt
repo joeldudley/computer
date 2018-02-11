@@ -11,32 +11,36 @@ class Generator {
     val knownChips = mutableMapOf<String, () -> HookUps>()
 
     fun convertNodeToGates(chip: Node.Chip) {
-        val createHookups = fun(): HookUps {
-            // Step 1: Create gates for all the variables involved in the chip definition.
-            val componentVariables = chip.components.flatMap { it.assignments.map { it.rhs } }
-            val allVariables = componentVariables + chip.ins + chip.outs
-            val gates = allVariables.map { it to RegGate() }.toMap()
+        // Step 1: Create a list of all the variables (the inputs, the outputs, and any internal variables used as
+        // RHS's in the linking of the internal components).
+        val componentVariables = chip.components.flatMap { it.assignments.map { it.rhs } }
 
-            // Step 2: Hook up all the gates.
+        val createHookups = fun(): HookUps {
+            // Step 2: Create a gate for each variable.
+            val ins = chip.ins.map { it to RegGate() }.toMap()
+            val outs = chip.outs.map { it to RegGate() }.toMap()
+            val gates = componentVariables.map { it to RegGate() }.toMap() + ins + outs
+
+            // Step 3: Hook up all the gates.
             for (component in chip.components) {
                 when (component.name) {
                     "Nand" -> {
                         val nandGate = NandGate()
 
                         for (assignment in component.assignments) {
-                            val gate = gates[assignment.rhs] ?: gates[assignment.rhs]!!
+                            val rhsGate = gates[assignment.rhs] ?: gates[assignment.rhs]!!
                             when (assignment.lhs) {
                                 "a" -> {
-                                    nandGate.input = gate
-                                    gate.outputs.add(nandGate)
+                                    nandGate.input = rhsGate
+                                    rhsGate.outputs.add(nandGate)
                                 }
                                 "b" -> {
-                                    nandGate.auxInput = gate
-                                    gate.outputs.add(nandGate)
+                                    nandGate.auxInput = rhsGate
+                                    rhsGate.outputs.add(nandGate)
                                 }
                                 "out" -> {
-                                    nandGate.outputs.add(gate)
-                                    gate.input = nandGate
+                                    nandGate.outputs.add(rhsGate)
+                                    rhsGate.input = nandGate
                                 }
                             }
                         }
@@ -63,8 +67,6 @@ class Generator {
                 }
             }
 
-            val ins = gates.filterKeys { it in chip.ins }
-            val outs = gates.filterKeys { it in chip.outs }
             return HookUps(ins, outs)
         }
 
