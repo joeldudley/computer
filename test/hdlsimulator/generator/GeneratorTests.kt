@@ -2,6 +2,7 @@ package hdlsimulator.generator
 
 import hdlsimulator.EXPECTED_AND_TREE
 import hdlsimulator.EXPECTED_NOT_TREE
+import hdlsimulator.EXPECTED_OR_TREE
 import org.testng.annotations.Test
 import kotlin.test.assertEquals
 
@@ -60,6 +61,42 @@ class GeneratorTests {
         a.eval()
         b.eval()
         assertEquals(false, out.value)
+
+        a.value = true
+        b.value = true
+        a.eval()
+        b.eval()
+        assertEquals(true, out.value)
+    }
+
+    @Test
+    fun orTest() {
+        generator.convertNodeToGates(EXPECTED_NOT_TREE)
+        generator.convertNodeToGates(EXPECTED_AND_TREE)
+        generator.convertNodeToGates(EXPECTED_OR_TREE)
+        val orGate = generator.knownChips["Or"]!!()
+
+        val a = orGate.ins["a"]!!
+        val b = orGate.ins["b"]!!
+        val out = orGate.outs["out"]!!
+
+        a.value = false
+        b.value = false
+        a.eval()
+        b.eval()
+        assertEquals(false, out.value)
+
+        a.value = false
+        b.value = true
+        a.eval()
+        b.eval()
+        assertEquals(true, out.value)
+
+        a.value = true
+        b.value = false
+        a.eval()
+        b.eval()
+        assertEquals(true, out.value)
 
         a.value = true
         b.value = true
