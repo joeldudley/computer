@@ -1,29 +1,25 @@
 package hdlsimulator
 
-abstract class Gate {
+open class Gate {
     var value = false
     lateinit var input: Gate
     val outputs = mutableListOf<Gate>()
-    abstract fun eval()
-}
-
-class RegGate : Gate() {
-    override fun eval() {
-        // TODO: Prevent gates without set inputs triggering exceptions differently.
-        try {
-            value = input.value
-        } catch (e: UninitializedPropertyAccessException) {
-            
+    fun eval() {
+        outputs.forEach { output ->
+            output.update()
+            output.eval()
         }
-        outputs.forEach { it.eval() }
+    }
+
+    open fun update() {
+        value = input.value
     }
 }
 
 class NandGate : Gate() {
     lateinit var auxInput: Gate
 
-    override fun eval() {
+    override fun update() {
         value = !(input.value && auxInput.value)
-        outputs.forEach { it.eval() }
     }
 }

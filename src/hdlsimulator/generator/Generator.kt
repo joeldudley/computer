@@ -2,7 +2,6 @@ package hdlsimulator.generator
 
 import hdlsimulator.Gate
 import hdlsimulator.NandGate
-import hdlsimulator.RegGate
 import hdlsimulator.parser.Node
 
 data class ChipIOGates(val inGates: Map<String, Gate>, val outGates: Map<String, Gate>)
@@ -10,11 +9,11 @@ data class ChipIOGates(val inGates: Map<String, Gate>, val outGates: Map<String,
 val generateNandGate = fun(): ChipIOGates {
     val nandGate = NandGate()
 
-    val input = RegGate()
+    val input = Gate()
     nandGate.input = input
     input.outputs.add(nandGate)
 
-    val auxInput = RegGate()
+    val auxInput = Gate()
     nandGate.auxInput = auxInput
     auxInput.outputs.add(nandGate)
 
@@ -33,9 +32,9 @@ class Generator {
 
         val chipGenerator = fun(): ChipIOGates {
             // Step 2: Create a gate for each variable.
-            val ins = chip.ins.map { it to RegGate() }.toMap()
-            val outs = chip.outs.map { it to RegGate() }.toMap()
-            val gates = componentVariables.map { it to RegGate() }.toMap() + ins + outs
+            val ins = chip.ins.map { it to Gate() }.toMap()
+            val outs = chip.outs.map { it to Gate() }.toMap()
+            val gates = componentVariables.map { it to Gate() }.toMap() + ins + outs
 
             // Step 3: Hook up all the gates.
             chip.components.forEach { component ->
