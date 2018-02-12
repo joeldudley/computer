@@ -13,7 +13,7 @@ class RegGate : Gate() {
         try {
             value = input.value
         } catch (e: UninitializedPropertyAccessException) {
-
+            
         }
         outputs.forEach { it.eval() }
     }

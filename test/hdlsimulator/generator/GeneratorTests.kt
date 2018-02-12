@@ -1,8 +1,8 @@
 package hdlsimulator.generator
 
-import hdlsimulator.EXPECTED_AND_TREE
-import hdlsimulator.EXPECTED_NOT_TREE
-import hdlsimulator.EXPECTED_OR_TREE
+import hdlsimulator.AND_CHIP
+import hdlsimulator.NOT_CHIP
+import hdlsimulator.OR_CHIP
 import org.testng.annotations.Test
 import kotlin.test.assertEquals
 
@@ -11,11 +11,11 @@ class GeneratorTests {
 
     @Test
     fun notTest() {
-        generator.convertNodeToGates(EXPECTED_NOT_TREE)
-        val notGate = generator.knownChips["Not"]!!()
+        generator.installChipGenerator(NOT_CHIP)
+        val (notInGates, notOutGates) = generator.chipGenerators["Not"]!!()
 
-        val in_ = notGate.ins["in"]!!
-        val out = notGate.outs["out"]!!
+        val in_ = notInGates["in"]!!
+        val out = notOutGates["out"]!!
 
         in_.value = false
         in_.eval()
@@ -36,13 +36,13 @@ class GeneratorTests {
 
     @Test
     fun andTest() {
-        generator.convertNodeToGates(EXPECTED_NOT_TREE)
-        generator.convertNodeToGates(EXPECTED_AND_TREE)
-        val andGate = generator.knownChips["And"]!!()
+        generator.installChipGenerator(NOT_CHIP)
+        generator.installChipGenerator(AND_CHIP)
+        val (andInGates, andOutGates) = generator.chipGenerators["And"]!!()
 
-        val a = andGate.ins["a"]!!
-        val b = andGate.ins["b"]!!
-        val out = andGate.outs["out"]!!
+        val a = andInGates["a"]!!
+        val b = andInGates["b"]!!
+        val out = andOutGates["out"]!!
 
         a.value = false
         b.value = false
@@ -71,14 +71,14 @@ class GeneratorTests {
 
     @Test
     fun orTest() {
-        generator.convertNodeToGates(EXPECTED_NOT_TREE)
-        generator.convertNodeToGates(EXPECTED_AND_TREE)
-        generator.convertNodeToGates(EXPECTED_OR_TREE)
-        val orGate = generator.knownChips["Or"]!!()
+        generator.installChipGenerator(NOT_CHIP)
+        generator.installChipGenerator(AND_CHIP)
+        generator.installChipGenerator(OR_CHIP)
+        val (orInGates, orOutGates) = generator.chipGenerators["Or"]!!()
 
-        val a = orGate.ins["a"]!!
-        val b = orGate.ins["b"]!!
-        val out = orGate.outs["out"]!!
+        val a = orInGates["a"]!!
+        val b = orInGates["b"]!!
+        val out = orOutGates["out"]!!
 
         a.value = false
         b.value = false

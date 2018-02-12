@@ -2,17 +2,17 @@ package hdlsimulator
 
 import hdlsimulator.parser.Node
 
-val EXPECTED_NOT_TOKENS = listOf("CHIP", "Not", "{", "IN", "in", ";", "OUT", "out", ";", "PARTS:", "Nand", "(", "a",
+val NOT_HDL_TOKENS = listOf("CHIP", "Not", "{", "IN", "in", ";", "OUT", "out", ";", "PARTS:", "Nand", "(", "a",
         "=", "in", "b", "=", "in", "out", "=", "out", ")", ";", "}")
-val EXPECTED_AND_TOKENS = listOf("CHIP", "And", "{", "IN", "a", "b", ";", "OUT", "out", ";", "PARTS:", "Nand", "(",
+val AND_HDL_TOKENS = listOf("CHIP", "And", "{", "IN", "a", "b", ";", "OUT", "out", ";", "PARTS:", "Nand", "(",
         "a", "=", "a", "b", "=", "b", "out", "=", "nandout", ")", ";", "Not", "(", "in", "=", "nandout",
         "out", "=", "out", ")", ";", "}")
-val EXPECTED_OR_TOKENS = listOf("CHIP", "Or", "{", "IN", "a", "b", ";", "OUT", "out", ";", "PARTS:", "Not", "(", "in",
+val OR_HDL_TOKENS = listOf("CHIP", "Or", "{", "IN", "a", "b", ";", "OUT", "out", ";", "PARTS:", "Not", "(", "in",
         "=", "a", "out", "=", "nota", ")", ";", "Not", "(", "in", "=", "b", "out", "=", "notb", ")", ";", "And", "(",
         "a", "=", "nota", "b", "=", "notb", "out", "=", "notab", ")", ";", "Not", "(", "in", "=", "notab", "out", "=",
         "out", ")", ";", "}")
 
-val EXPECTED_NOT_TREE = {
+val NOT_CHIP = {
     val ins = listOf("in")
     val outs = listOf("out")
     val components = listOf(
@@ -28,7 +28,7 @@ val EXPECTED_NOT_TREE = {
     Node.Chip("Not", ins, outs, components)
 }()
 
-val EXPECTED_AND_TREE = {
+val AND_CHIP = {
     val ins = listOf("a", "b")
     val outs = listOf("out")
     val components = listOf(
@@ -51,7 +51,7 @@ val EXPECTED_AND_TREE = {
     Node.Chip("And", ins, outs, components)
 }()
 
-val EXPECTED_OR_TREE = {
+val OR_CHIP = {
     val ins = listOf("a", "b")
     val outs = listOf("out")
     val components = listOf(

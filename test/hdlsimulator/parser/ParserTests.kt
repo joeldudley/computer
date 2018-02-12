@@ -9,22 +9,22 @@ class ParserTests {
 
     @Test
     fun notTest() {
-        parser.setInput(EXPECTED_NOT_TOKENS)
+        parser.setInput(NOT_HDL_TOKENS)
         val tree = parser.parse()
-        assertEquals(EXPECTED_NOT_TREE, tree)
+        assertEquals(NOT_CHIP, tree)
     }
 
     @Test
     fun andTest() {
-        parser.setInput(EXPECTED_AND_TOKENS)
+        parser.setInput(AND_HDL_TOKENS)
         val tree = parser.parse()
-        assertEquals(EXPECTED_AND_TREE, tree)
+        assertEquals(AND_CHIP, tree)
     }
 
     @Test
     fun orTest() {
-        parser.setInput(EXPECTED_OR_TOKENS)
+        parser.setInput(OR_HDL_TOKENS)
         val tree = parser.parse()
-        assertEquals(EXPECTED_OR_TREE, tree)
+        assertEquals(OR_CHIP, tree)
     }
 }
