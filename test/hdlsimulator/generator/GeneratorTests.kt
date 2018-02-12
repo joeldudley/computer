@@ -3,11 +3,13 @@ package hdlsimulator.generator
 import hdlsimulator.AND_CHIP
 import hdlsimulator.NOT_CHIP
 import hdlsimulator.OR_CHIP
+import hdlsimulator.evaluator.Evaluator
 import org.testng.annotations.Test
 import kotlin.test.assertEquals
 
 class GeneratorTests {
     private val generator = Generator()
+    private val evaluator = Evaluator()
 
     @Test
     fun notTest() {
@@ -17,20 +19,16 @@ class GeneratorTests {
         val in_ = notInGates["in"]!!
         val out = notOutGates["out"]!!
 
-        in_.value = false
-        in_.eval()
+        evaluator.evaluate(listOf(in_ to false))
         assertEquals(true, out.value)
 
-        in_.value = true
-        in_.eval()
+        evaluator.evaluate(listOf(in_ to true))
         assertEquals(false, out.value)
 
-        in_.value = false
-        in_.eval()
+        evaluator.evaluate(listOf(in_ to false))
         assertEquals(true, out.value)
 
-        in_.value = true
-        in_.eval()
+        evaluator.evaluate(listOf(in_ to true))
         assertEquals(false, out.value)
     }
 
@@ -44,28 +42,16 @@ class GeneratorTests {
         val b = andInGates["b"]!!
         val out = andOutGates["out"]!!
 
-        a.value = false
-        b.value = false
-        a.eval()
-        b.eval()
+        evaluator.evaluate(listOf(a to false, b to false))
         assertEquals(false, out.value)
 
-        a.value = false
-        b.value = true
-        a.eval()
-        b.eval()
+        evaluator.evaluate(listOf(a to false, b to true))
         assertEquals(false, out.value)
 
-        a.value = true
-        b.value = false
-        a.eval()
-        b.eval()
+        evaluator.evaluate(listOf(a to true, b to false))
         assertEquals(false, out.value)
 
-        a.value = true
-        b.value = true
-        a.eval()
-        b.eval()
+        evaluator.evaluate(listOf(a to true, b to true))
         assertEquals(true, out.value)
     }
 
@@ -80,28 +66,16 @@ class GeneratorTests {
         val b = orInGates["b"]!!
         val out = orOutGates["out"]!!
 
-        a.value = false
-        b.value = false
-        a.eval()
-        b.eval()
+        evaluator.evaluate(listOf(a to false, b to false))
         assertEquals(false, out.value)
 
-        a.value = false
-        b.value = true
-        a.eval()
-        b.eval()
+        evaluator.evaluate(listOf(a to false, b to true))
         assertEquals(true, out.value)
 
-        a.value = true
-        b.value = false
-        a.eval()
-        b.eval()
+        evaluator.evaluate(listOf(a to true, b to false))
         assertEquals(true, out.value)
 
-        a.value = true
-        b.value = true
-        a.eval()
-        b.eval()
+        evaluator.evaluate(listOf(a to true, b to true))
         assertEquals(true, out.value)
     }
 }
