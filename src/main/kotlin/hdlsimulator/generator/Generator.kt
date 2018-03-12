@@ -1,7 +1,7 @@
 package hdlsimulator.generator
 
 import hdlsimulator.ChipIOGates
-import hdlsimulator.Gate
+import hdlsimulator.PassthroughGate
 import hdlsimulator.parser.Node
 
 class Generator {
@@ -12,9 +12,9 @@ class Generator {
             val componentVariables = chip.components.flatMap { it.assignments.map { it.rhs } }
 
             // Step 2: Create a gate for each variable.
-            val ins = chip.ins.map { it to Gate() }.toMap()
-            val outs = chip.outs.map { it to Gate() }.toMap()
-            val gates = componentVariables.map { it to Gate() }.toMap() + ins + outs
+            val ins = chip.ins.map { it to PassthroughGate() }.toMap()
+            val outs = chip.outs.map { it to PassthroughGate() }.toMap()
+            val gates = componentVariables.map { it to PassthroughGate() }.toMap() + ins + outs
 
             // Step 3: Hook up all the gates.
             chip.components.forEach { component ->

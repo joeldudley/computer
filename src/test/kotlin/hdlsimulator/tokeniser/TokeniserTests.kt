@@ -12,21 +12,21 @@ class TokeniserTests {
 
     @Test
     fun notTest() {
-        val input = File("test/hdlsimulator/tokeniser/Not.hdl").readText()
+        val input = File("src/main/resources/Not.hdl").readText()
         val tokens = tokeniser.tokenize(input)
         assertEquals(NOT_HDL_TOKENS, tokens)
     }
 
     @Test
     fun andTest() {
-        val input = File("test/hdlsimulator/tokeniser/And.hdl").readText()
+        val input = File("src/main/resources/And.hdl").readText()
         val tokens = tokeniser.tokenize(input)
         assertEquals(AND_HDL_TOKENS, tokens)
     }
 
     @Test
     fun orTest() {
-        val input = File("test/hdlsimulator/tokeniser/Or.hdl").readText()
+        val input = File("src/main/resources/Or.hdl").readText()
         val tokens = tokeniser.tokenize(input)
         assertEquals(OR_HDL_TOKENS, tokens)
     }

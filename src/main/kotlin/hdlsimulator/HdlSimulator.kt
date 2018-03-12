@@ -5,26 +5,32 @@ import hdlsimulator.parser.Parser
 import hdlsimulator.tokeniser.Tokeniser
 import java.io.File
 
+// Maps input and output gate names to input and output gates for a chip.
 data class ChipIOGates(val inGates: Map<String, Gate>, val outGates: Map<String, Gate>)
 
-val nandGateFun = fun(): ChipIOGates {
-    val nandGate = NandGate()
-
-    val input = Gate()
-    nandGate.in1 = input
-    input.outputs.add(nandGate)
-
-    val auxInput = Gate()
-    nandGate.in2 = auxInput
-    auxInput.outputs.add(nandGate)
-
-    val ins = mapOf("a" to input, "b" to auxInput)
-    val outs = mapOf("out" to nandGate)
-    return ChipIOGates(ins, outs)
-}
-
 class HdlSimulator {
-    val chipFuns = mutableMapOf<String, () -> ChipIOGates>()
+    // A function that returns a Nand gate.
+    private val nandGenerator = fun(): ChipIOGates {
+        val nandGate = NandGate()
+
+        val in1 = PassthroughGate()
+        nandGate.in1 = in1
+        in1.outputs.add(nandGate)
+
+        val in2 = PassthroughGate()
+        nandGate.in2 = in2
+        in2.outputs.add(nandGate)
+
+        return ChipIOGates(
+                inGates = mapOf("a" to in1, "b" to in2),
+                outGates = mapOf("out" to nandGate))
+    }
+
+    // Known chip generators.
+    val chipGenerators = mutableMapOf(
+            "Nand" to nandGenerator
+    )
+    // The chip currently being simulated.
     private var loadedChip: ChipIOGates? = null
 
     private val tokeniser = Tokeniser()
@@ -32,20 +38,18 @@ class HdlSimulator {
     private val generator = Generator()
 
     init {
-        chipFuns.put("Nand", nandGateFun)
-
-        for (file in File("./resources").listFiles()) {
+        File("src/main/resources").listFiles().forEach { file ->
             val fileContents = file.readText()
             val tokens = tokeniser.tokenize(fileContents)
             parser.setInput(tokens)
             val chip = parser.parse()
-            val chipFun = generator.generateChipFun(chip, chipFuns)
-            chipFuns.put(chip.name, chipFun)
+            val chipFun = generator.generateChipFun(chip, chipGenerators)
+            chipGenerators.put(chip.name, chipFun)
         }
     }
 
     fun loadChip(name: String) {
-        loadedChip = chipFuns[name]!!()
+        loadedChip = chipGenerators[name]!!()
     }
 
     fun evaluateChip(inputs: List<Pair<String, Boolean>>) {
