@@ -8,8 +8,13 @@ import java.io.File
 // Maps input and output gate names to input and output gates for a chip.
 data class ChipIOGates(val inGates: Map<String, Gate>, val outGates: Map<String, Gate>)
 
-class HdlSimulator {
-    // A function that returns a Nand gate.
+/**
+ * Loads chips into memory, simulates running them, and reads back the results.
+ *
+ * Can generate a Nand gate, plus any chips described in HDL format in the resources folder.
+ */
+class HdlSimulator(chipDefFolders: List<String>) {
+    // A function that generates a Nand gate.
     private val nandGenerator = fun(): ChipIOGates {
         val nandGate = NandGate()
 
@@ -27,39 +32,44 @@ class HdlSimulator {
     }
 
     // Known chip generators.
-    val chipGenerators = mutableMapOf(
+    private val chipGenerators = mutableMapOf(
             "Nand" to nandGenerator
     )
     // The chip currently being simulated.
-    private var loadedChip: ChipIOGates? = null
+    private lateinit var loadedChip: ChipIOGates
 
     private val tokeniser = Tokeniser()
     private val parser = Parser()
     private val generator = Generator()
 
     init {
-        File("src/main/resources").listFiles().forEach { file ->
-            val fileContents = file.readText()
-            val tokens = tokeniser.tokenize(fileContents)
-            parser.setInput(tokens)
-            val chip = parser.parse()
-            val chipFun = generator.generateChipFun(chip, chipGenerators)
-            chipGenerators.put(chip.name, chipFun)
+        chipDefFolders.forEach { folder ->
+            File(folder).listFiles().forEach { file -> addChipGenerator(file) }
         }
+    }
+
+    private fun addChipGenerator(file: File) {
+        val fileContents = file.readText()
+        val tokens = tokeniser.tokenize(fileContents)
+        parser.setInput(tokens)
+        val chip = parser.parse()
+        val chipFun = generator.generateChipFun(chip, chipGenerators)
+        chipGenerators.put(chip.name, chipFun)
     }
 
     fun loadChip(name: String) {
-        loadedChip = chipGenerators[name]!!()
+        loadedChip = chipGenerators[name]?.invoke() ?: throw IllegalArgumentException("Unknown chip.")
     }
 
     fun evaluateChip(inputs: List<Pair<String, Boolean>>) {
-        val outputs = mutableListOf<Gate>()
-        for ((gateName, newValue) in inputs) {
-            val gate = loadedChip!!.inGates[gateName]!!
+        // We set the value of each input gate and get the downstream output gates.
+        val outputs = inputs.flatMap { (gateName, newValue) ->
+            val gate = loadedChip.inGates[gateName] ?: throw IllegalArgumentException("Unknown input gate.")
             gate.value = newValue
-            outputs.addAll(gate.outputs)
-        }
+            gate.outputs
+        }.toMutableList()
 
+        // We recursively update the downstream outputs.
         var i = 0
         while (i < outputs.size) {
             val output = outputs[i]
@@ -69,7 +79,7 @@ class HdlSimulator {
         }
     }
 
-    fun readValue(gateName: String): Boolean{
-        return loadedChip!!.outGates[gateName]!!.value
+    fun readValue(gateName: String): Boolean {
+        return loadedChip.outGates[gateName]?.value ?: throw IllegalArgumentException("Unknown output gate.")
     }
 }

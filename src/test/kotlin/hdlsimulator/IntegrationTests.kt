@@ -4,56 +4,56 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 class IntegrationTests {
-    private val evaluator = HdlSimulator()
+    private val simulator = HdlSimulator(listOf("src/main/resources"))
 
     @Test
     fun notTest() {
-        evaluator.loadChip("Not")
+        simulator.loadChip("Not")
 
-        evaluator.evaluateChip(listOf("in" to false))
-        assertEquals(true, evaluator.readValue("out"))
+        simulator.evaluateChip(listOf("in" to false))
+        assertEquals(true, simulator.readValue("out"))
 
-        evaluator.evaluateChip(listOf("in" to true))
-        assertEquals(false, evaluator.readValue("out"))
+        simulator.evaluateChip(listOf("in" to true))
+        assertEquals(false, simulator.readValue("out"))
 
-        evaluator.evaluateChip(listOf("in" to false))
-        assertEquals(true, evaluator.readValue("out"))
+        simulator.evaluateChip(listOf("in" to false))
+        assertEquals(true, simulator.readValue("out"))
 
-        evaluator.evaluateChip(listOf("in" to true))
-        assertEquals(false, evaluator.readValue("out"))
+        simulator.evaluateChip(listOf("in" to true))
+        assertEquals(false, simulator.readValue("out"))
     }
 
     @Test
     fun andTest() {
-        evaluator.loadChip("And")
+        simulator.loadChip("And")
 
-        evaluator.evaluateChip(listOf("a" to false, "b" to false))
-        assertEquals(false, evaluator.readValue("out"))
+        simulator.evaluateChip(listOf("a" to false, "b" to false))
+        assertEquals(false, simulator.readValue("out"))
 
-        evaluator.evaluateChip(listOf("a" to false, "b" to true))
-        assertEquals(false, evaluator.readValue("out"))
+        simulator.evaluateChip(listOf("a" to false, "b" to true))
+        assertEquals(false, simulator.readValue("out"))
 
-        evaluator.evaluateChip(listOf("a" to true, "b" to false))
-        assertEquals(false, evaluator.readValue("out"))
+        simulator.evaluateChip(listOf("a" to true, "b" to false))
+        assertEquals(false, simulator.readValue("out"))
 
-        evaluator.evaluateChip(listOf("a" to true, "b" to true))
-        assertEquals(true, evaluator.readValue("out"))
+        simulator.evaluateChip(listOf("a" to true, "b" to true))
+        assertEquals(true, simulator.readValue("out"))
     }
 
     @Test
     fun orTest() {
-        evaluator.loadChip("Or")
+        simulator.loadChip("Or")
 
-        evaluator.evaluateChip(listOf("a" to false, "b" to false))
-        assertEquals(false, evaluator.readValue("out"))
+        simulator.evaluateChip(listOf("a" to false, "b" to false))
+        assertEquals(false, simulator.readValue("out"))
 
-        evaluator.evaluateChip(listOf("a" to false, "b" to true))
-        assertEquals(true, evaluator.readValue("out"))
+        simulator.evaluateChip(listOf("a" to false, "b" to true))
+        assertEquals(true, simulator.readValue("out"))
 
-        evaluator.evaluateChip(listOf("a" to true, "b" to false))
-        assertEquals(true, evaluator.readValue("out"))
+        simulator.evaluateChip(listOf("a" to true, "b" to false))
+        assertEquals(true, simulator.readValue("out"))
 
-        evaluator.evaluateChip(listOf("a" to true, "b" to true))
-        assertEquals(true, evaluator.readValue("out"))
+        simulator.evaluateChip(listOf("a" to true, "b" to true))
+        assertEquals(true, simulator.readValue("out"))
     }
 }
