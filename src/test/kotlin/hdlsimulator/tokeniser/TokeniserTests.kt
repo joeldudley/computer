@@ -3,7 +3,7 @@ package hdlsimulator.tokeniser
 import hdlsimulator.AND_HDL_TOKENS
 import hdlsimulator.NOT_HDL_TOKENS
 import hdlsimulator.OR_HDL_TOKENS
-import org.testng.annotations.Test
+import org.junit.Test
 import java.io.File
 import kotlin.test.assertEquals
 

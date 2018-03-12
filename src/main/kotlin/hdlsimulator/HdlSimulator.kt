@@ -11,11 +11,11 @@ val nandGateFun = fun(): ChipIOGates {
     val nandGate = NandGate()
 
     val input = Gate()
-    nandGate.input = input
+    nandGate.in1 = input
     input.outputs.add(nandGate)
 
     val auxInput = Gate()
-    nandGate.auxInput = auxInput
+    nandGate.in2 = auxInput
     auxInput.outputs.add(nandGate)
 
     val ins = mapOf("a" to input, "b" to auxInput)

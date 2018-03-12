@@ -27,12 +27,12 @@ class Generator {
                     when (assignment.lhs) {
                         in componentInGates -> {
                             val lhsGate = componentInGates[assignment.lhs]!!
-                            lhsGate.input = rhsGate
+                            lhsGate.in1 = rhsGate
                             rhsGate.outputs.add(lhsGate)
                         }
                         in componentOutGates -> {
                             val lhsGate = componentOutGates[assignment.lhs]!!
-                            rhsGate.input = lhsGate
+                            rhsGate.in1 = lhsGate
                             lhsGate.outputs.add(rhsGate)
                         }
                         else -> throw IllegalArgumentException("LHS not found in chip definition.")
