@@ -1,19 +1,20 @@
 package hdlsimulator
 
 open class Gate {
-    var value = false
-    lateinit var input: Gate
+    lateinit var in1: Gate
     val outputs = mutableListOf<Gate>()
+    var value = false
+        private set
 
     open fun update() {
-        value = input.value
+        value = in1.value
     }
 }
 
 class NandGate : Gate() {
-    lateinit var auxInput: Gate
+    lateinit var in2: Gate
 
     override fun update() {
-        value = !(input.value && auxInput.value)
+        value = !(in1.value && in2.value)
     }
 }
