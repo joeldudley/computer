@@ -4,7 +4,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 class IntegrationTests {
-    private val simulator = HdlSimulator(listOf("src/main/resources"))
+    private val simulator = HdlSimulator(listOf("src/test/resources"))
 
     @Test
     fun notTest() {
