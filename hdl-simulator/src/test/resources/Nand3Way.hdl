@@ -1,0 +1,14 @@
+/**
+ * Three-way Nand gate:
+ * out = 0 if (a == 1 and b == 1 and c == 1)
+ *       1 otherwise
+ */
+
+CHIP Nand3Way {
+    IN a, b, c;
+    OUT out;
+
+    PARTS:
+    And(a=a, b=b, out=aAndB)
+    Nand(a=aAndB, b=c, out=out)
+}

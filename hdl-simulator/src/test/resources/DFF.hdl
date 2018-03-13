@@ -1,0 +1,12 @@
+/**
+ * DFF gate:
+ * out(t) = in(t-1)
+ */
+
+CHIP DFF {
+    IN data, clock;
+    OUT out;
+
+    PARTS:
+    TODO("Write parts based on https://en.wikipedia.org/wiki/Flip-flop_(electronics)#/media/File:Edge_triggered_D_flip_flop.svg.")
+}
