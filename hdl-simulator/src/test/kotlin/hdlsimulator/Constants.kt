@@ -2,6 +2,12 @@ package hdlsimulator
 
 import hdlsimulator.parser.Node
 
+val MISSING_INS_SEMICOLON_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", "OUT", "out", ";", "PARTS:", "Nand", "(", "a",
+        "=", "in", "b", "=", "in", "out", "=", "out", ")", "}")
+val MISSING_OUTS_SEMICOLON_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", ";", "OUT", "out", "PARTS:", "Nand", "(", "a",
+        "=", "in", "b", "=", "in", "out", "=", "out", ")", "}")
+val MISSING_COMPONENT_SEMICOLON_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", ";", "OUT", "out", ";", "PARTS:", "Nand", "(", "a",
+        "=", "in", "b", "=", "in", "out", "=", "out", ")", "}")
 val NOT_HDL_TOKENS = listOf("CHIP", "Not", "{", "IN", "in", ";", "OUT", "out", ";", "PARTS:", "Nand", "(", "a",
         "=", "in", "b", "=", "in", "out", "=", "out", ")", ";", "}")
 val AND_HDL_TOKENS = listOf("CHIP", "And", "{", "IN", "a", "b", ";", "OUT", "out", ";", "PARTS:", "Nand", "(",

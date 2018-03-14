@@ -3,11 +3,34 @@ package hdlsimulator.parser
 import hdlsimulator.*
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class ParserTests {
     private val parser = Parser()
 
-    // TODO: Test of missing semi-colons.
+    @Test
+    fun missingSemiColonAfterInsTest() {
+        parser.setInput(MISSING_INS_SEMICOLON_TOKENS)
+        assertFailsWith<IllegalArgumentException>("Missing semi-colon after inputs.") {
+            parser.parse()
+        }
+    }
+
+    @Test
+    fun missingSemiColonAfterOutsTest() {
+        parser.setInput(MISSING_OUTS_SEMICOLON_TOKENS)
+        assertFailsWith<IllegalArgumentException>("Missing semi-colon after outputs.") {
+            parser.parse()
+        }
+    }
+
+    @Test
+    fun missingSemiColonAfterComponentTest() {
+        parser.setInput(MISSING_COMPONENT_SEMICOLON_TOKENS)
+        assertFailsWith<IllegalArgumentException>("Missing semi-colon after component name.") {
+            parser.parse()
+        }
+    }
 
     @Test
     fun notTest() {
