@@ -8,5 +8,7 @@ CHIP DFF {
     OUT out;
 
     PARTS:
-    TODO("Write parts based on https://en.wikipedia.org/wiki/Flip-flop_(electronics)#/media/File:Edge_triggered_D_flip_flop.svg.")
+
 }
+
+TODO("Write parts based on https://en.wikipedia.org/wiki/Flip-flop_(electronics)#/media/File:Edge_triggered_D_flip_flop.svg.")

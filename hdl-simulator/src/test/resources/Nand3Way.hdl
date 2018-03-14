@@ -9,6 +9,6 @@ CHIP Nand3Way {
     OUT out;
 
     PARTS:
-    And(a=a, b=b, out=aAndB)
-    Nand(a=aAndB, b=c, out=out)
+    And(a=a, b=b, out=aAndB);
+    Nand(a=aAndB, b=c, out=out);
 }

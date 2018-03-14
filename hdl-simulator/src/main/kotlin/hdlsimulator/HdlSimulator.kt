@@ -44,7 +44,9 @@ class HdlSimulator(chipDefFolders: List<String>) {
 
     init {
         chipDefFolders.forEach { folder ->
-            File(folder).listFiles().forEach { file -> addChipGenerator(file) }
+            File(folder).listFiles().forEach {
+                file -> addChipGenerator(file)
+            }
         }
     }
 

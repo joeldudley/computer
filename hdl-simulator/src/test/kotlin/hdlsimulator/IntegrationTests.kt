@@ -60,6 +60,37 @@ class IntegrationTests {
         assertEquals(true, simulator.readValue("out"))
     }
 
+    // Test of the 3-way nand gate.
+    // It's a component part of the DFF, and no solution is provided as part of Nand2Tetris.
+    @Test
+    fun nand3WayTest() {
+        simulator.loadChip("Nand3Way")
+
+        simulator.evaluateChip(listOf("a" to false, "b" to false, "c" to false))
+        assertEquals(true, simulator.readValue("out"))
+
+        simulator.evaluateChip(listOf("a" to false, "b" to false, "c" to true))
+        assertEquals(true, simulator.readValue("out"))
+
+        simulator.evaluateChip(listOf("a" to false, "b" to true, "c" to false))
+        assertEquals(true, simulator.readValue("out"))
+
+        simulator.evaluateChip(listOf("a" to false, "b" to true, "c" to true))
+        assertEquals(true, simulator.readValue("out"))
+
+        simulator.evaluateChip(listOf("a" to true, "b" to false, "c" to false))
+        assertEquals(true, simulator.readValue("out"))
+
+        simulator.evaluateChip(listOf("a" to true, "b" to false, "c" to true))
+        assertEquals(true, simulator.readValue("out"))
+
+        simulator.evaluateChip(listOf("a" to true, "b" to true, "c" to false))
+        assertEquals(true, simulator.readValue("out"))
+
+        simulator.evaluateChip(listOf("a" to true, "b" to true, "c" to true))
+        assertEquals(false, simulator.readValue("out"))
+    }
+
     // Test of a small recursive gate.
     @Test
     fun dffTest() {

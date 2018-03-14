@@ -29,17 +29,17 @@ internal class Parser {
     }
 
     private fun parseChipName(): String {
-        if (tokens[pos] != "CHIP") throw IllegalArgumentException("Malformed input.")
+        if (tokens[pos] != "CHIP") throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
         pos++
         val chipName = tokens[pos]
         pos++
-        if (tokens[pos] != "{") throw IllegalArgumentException("Malformed input.")
+        if (tokens[pos] != "{") throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
         pos++
         return chipName
     }
 
     private fun parseIns(): List<String> {
-        if (tokens[pos] != "IN") throw IllegalArgumentException("Malformed input.")
+        if (tokens[pos] != "IN") throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
         pos++
         val ins = mutableListOf<String>()
         while (tokens[pos] != ";") {
@@ -52,7 +52,7 @@ internal class Parser {
     }
 
     private fun parseOuts(): List<String> {
-        if (tokens[pos] != "OUT") throw IllegalArgumentException("Malformed input.")
+        if (tokens[pos] != "OUT") throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
         pos++
         val ins = mutableListOf<String>()
         while (tokens[pos] != ";") {
@@ -65,21 +65,21 @@ internal class Parser {
     }
 
     private fun parseParts() {
-        if (tokens[pos] != "PARTS:") throw IllegalArgumentException("Malformed input.")
+        if (tokens[pos] != "PARTS:") throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
         pos++
     }
 
     private fun parseComponent(): Node.Component {
         val componentName = tokens[pos]
         pos++
-        if (tokens[pos] != "(") throw IllegalArgumentException("Malformed input.")
+        if (tokens[pos] != "(") throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
         pos++
 
         val assigments = mutableListOf<Node.Assignment>()
         while (tokens[pos] != ")") {
             val lhs = tokens[pos]
             pos++
-            if (tokens[pos] != "=") throw IllegalArgumentException("Malformed input.")
+            if (tokens[pos] != "=") throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
             pos++
             val rhs = tokens[pos]
             pos++
@@ -87,7 +87,7 @@ internal class Parser {
             assigments.add(assignment)
         }
         pos++
-        if (tokens[pos] != ";") throw IllegalArgumentException("Malformed input.")
+        if (tokens[pos] != ";") throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
         pos++
 
         return Node.Component(componentName, assigments)

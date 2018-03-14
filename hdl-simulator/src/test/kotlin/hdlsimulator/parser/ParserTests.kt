@@ -7,6 +7,8 @@ import kotlin.test.assertEquals
 class ParserTests {
     private val parser = Parser()
 
+    // TODO: Test of missing semi-colons.
+
     @Test
     fun notTest() {
         parser.setInput(NOT_HDL_TOKENS)
