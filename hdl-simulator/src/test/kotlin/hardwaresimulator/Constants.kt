@@ -21,10 +21,17 @@ val MISSING_OUTS_SEMICOLON_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", ";", "
         "a", "=", "in", ",", "b", "=", "in", ",", "out", "=", "out", ")", "}")
 val MISSING_COMPONENT_SEMICOLON_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", ";", "OUT", "out", ";", "PARTS:",
         "Nand", "(", "a", "=", "in", ",", "b", "=", "in", ",", "out", "=", "out", ")", "}")
+
 val MISSING_CHIP_TOKEN_TOKENS = listOf("NA")
 val MISSING_IN_TOKEN_TOKENS = listOf("CHIP", "NA", "{", "in")
 val MISSING_OUT_TOKEN_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", ";", "out")
 val MISSING_PARTS_TOKEN_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", ";", "OUT", "out", ";", "Nand")
+
+val NO_INPUTS_TOKENS = listOf("CHIP", "Not", "{", "IN", ";", "OUT", "out", ";", "PARTS:", "Nand", "(", "a", "=",
+        "in", ",", "b", "=", "in", ",", "out", "=", "out", ")", ";", "}")
+val NO_OUTPUTS_TOKENS = listOf("CHIP", "Not", "{", "IN", "in", ";", "OUT", ";", "PARTS:", "Nand", "(", "a", "=",
+        "in", ",", "b", "=", "in", ",", "out", "=", "out", ")", ";", "}")
+val NO_COMPONENTS_TOKENS = listOf("CHIP", "Not", "{", "IN", "in", ";", "OUT", "out", ";", "PARTS:", "}")
 
 val NOT_CHIP = {
     val ins = listOf(

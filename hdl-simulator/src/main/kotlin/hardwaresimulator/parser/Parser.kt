@@ -40,7 +40,9 @@ internal class Parser {
 
     private fun parsePins(trailingWord: String): List<Node.Pin> {
         val ins = mutableListOf<Node.Pin>()
-        while (true) {
+        // Using this check instead of `true` correctly handles the case of
+        // no inputs.
+        while (tokens[pos] != ";") {
             val inName = tokens[pos++]
 
             val inWidth = if (tokens[pos] == "[") {

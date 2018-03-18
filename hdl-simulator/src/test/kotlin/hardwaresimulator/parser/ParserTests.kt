@@ -114,6 +114,27 @@ class ParserTests {
         parser.parse()
     }
 
+    // Tests that the parser doesn't throw for an empty inputs list.
+    @Test
+    fun noInputTokensTest() {
+        parser.setInput(NO_INPUTS_TOKENS)
+        parser.parse()
+    }
+
+    // Tests that the parser doesn't throw for an empty outputs list.
+    @Test
+    fun noOutputTokensTest() {
+        parser.setInput(NO_OUTPUTS_TOKENS)
+        parser.parse()
+    }
+
+    // Tests that the parser doesn't throw for an empty components list.
+    @Test
+    fun noComponentTokensTest() {
+        parser.setInput(NO_COMPONENTS_TOKENS)
+        parser.parse()
+    }
+
     // TODO: Test of missing width in brackets in inputs.
     // TODO: Test of missing width in brackets in outputs.
     // TODO: Test of missing width in brackets in parts.
