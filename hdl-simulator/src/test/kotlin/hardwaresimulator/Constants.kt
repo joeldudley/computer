@@ -35,18 +35,27 @@ val NO_COMPONENTS_TOKENS = listOf("CHIP", "Not", "{", "IN", "in", ";", "OUT", "o
 
 val NOT_CHIP = {
     val ins = listOf(
-            Node.Pin("in", 1)
+            Node.IOPin("in", 1)
     )
     val outs = listOf(
-            Node.Pin("out", 1)
+            Node.IOPin("out", 1)
     )
     val components = listOf(
             Node.Component(
                     "Nand",
                     listOf(
-                            Node.Assignment("a", "in"),
-                            Node.Assignment("b", "in"),
-                            Node.Assignment("out", "out")
+                            Node.Assignment(
+                                    Node.Pin("a", 0),
+                                    Node.Pin("in", 0)
+                            ),
+                            Node.Assignment(
+                                    Node.Pin("b", 0),
+                                    Node.Pin("in", 0)
+                            ),
+                            Node.Assignment(
+                                    Node.Pin("out", 0),
+                                    Node.Pin("out", 0)
+                            )
                     )
             )
     )
@@ -55,26 +64,41 @@ val NOT_CHIP = {
 
 val AND_CHIP = {
     val ins = listOf(
-            Node.Pin("a", 1),
-            Node.Pin("b", 1)
+            Node.IOPin("a", 1),
+            Node.IOPin("b", 1)
     )
     val outs = listOf(
-            Node.Pin("out", 1)
+            Node.IOPin("out", 1)
     )
     val components = listOf(
             Node.Component(
                     "Nand",
                     listOf(
-                            Node.Assignment("a", "a"),
-                            Node.Assignment("b", "b"),
-                            Node.Assignment("out", "nandOut")
+                            Node.Assignment(
+                                    Node.Pin("a", 0),
+                                    Node.Pin("a", 0)
+                            ),
+                            Node.Assignment(
+                                    Node.Pin("b", 0),
+                                    Node.Pin("b", 0)
+                            ),
+                            Node.Assignment(
+                                    Node.Pin("out", 0),
+                                    Node.Pin("nandOut", 0)
+                            )
                     )
             ),
             Node.Component(
                     "Not",
                     listOf(
-                            Node.Assignment("in", "nandOut"),
-                            Node.Assignment("out", "out")
+                            Node.Assignment(
+                                    Node.Pin("in", 0),
+                                    Node.Pin("nandOut", 0)
+                            ),
+                            Node.Assignment(
+                                    Node.Pin("out", 0),
+                                    Node.Pin("out", 0)
+                            )
                     )
             )
     )
@@ -83,84 +107,88 @@ val AND_CHIP = {
 
 val OR_CHIP = {
     val ins = listOf(
-            Node.Pin("a", 1),
-            Node.Pin("b", 1)
+            Node.IOPin("a", 1),
+            Node.IOPin("b", 1)
     )
     val outs = listOf(
-            Node.Pin("out", 1)
+            Node.IOPin("out", 1)
     )
     val components = listOf(
             Node.Component(
                     "Not",
                     listOf(
-                            Node.Assignment("in", "a"),
-                            Node.Assignment("out", "notA")
+                            Node.Assignment(
+                                    Node.Pin("in", 0),
+                                    Node.Pin("a", 0)
+                            ),
+                            Node.Assignment(
+                                    Node.Pin("out", 0),
+                                    Node.Pin("notA", 0)
+                            )
                     )
             ),
             Node.Component(
                     "Not",
                     listOf(
-                            Node.Assignment("in", "b"),
-                            Node.Assignment("out", "notB")
+                            Node.Assignment(
+                                    Node.Pin("in", 0),
+                                    Node.Pin("b", 0)
+                            ),
+                            Node.Assignment(
+                                    Node.Pin("out", 0),
+                                    Node.Pin("notB", 0)
+                            )
                     )
             ),
             Node.Component(
                     "And",
                     listOf(
-                            Node.Assignment("a", "notA"),
-                            Node.Assignment("b", "notB"),
-                            Node.Assignment("out", "notAB")
+                            Node.Assignment(
+                                    Node.Pin("a", 0),
+                                    Node.Pin("notA", 0)
+                            ),
+                            Node.Assignment(
+                                    Node.Pin("b", 0),
+                                    Node.Pin("notB", 0)
+                            ),
+                            Node.Assignment(
+                                    Node.Pin("out", 0),
+                                    Node.Pin("notAB", 0)
+                            )
                     )
             ),
             Node.Component(
                     "Not",
                     listOf(
-                            Node.Assignment("in", "notAB"),
-                            Node.Assignment("out", "out")
+                            Node.Assignment(
+                                    Node.Pin("in", 0),
+                                    Node.Pin("notAB", 0)
+                            ),
+                            Node.Assignment(
+                                    Node.Pin("out", 0),
+                                    Node.Pin("out", 0)
+                            )
                     )
             )
     )
     Node.Chip("Or", ins, outs, components)
 }()
 
-// TODO: Update.
 val NOT16_CHIP = {
     val ins = listOf(
-            Node.Pin("in", 16)
+            Node.IOPin("in", 16)
     )
     val outs = listOf(
-            Node.Pin("out", 16)
+            Node.IOPin("out", 16)
     )
-    val components = listOf(
-            Node.Component(
-                    "Not",
-                    listOf(
-                            Node.Assignment("in", "a"),
-                            Node.Assignment("out", "nota")
-                    )
-            ),
-            Node.Component(
-                    "Not",
-                    listOf(
-                            Node.Assignment("in", "b"),
-                            Node.Assignment("out", "notb")
-                    )
-            ),
-            Node.Component(
-                    "And",
-                    listOf(
-                            Node.Assignment("a", "nota"),
-                            Node.Assignment("b", "notb"),
-                            Node.Assignment("out", "notab")
-                    )
-            ),
-            Node.Component(
-                    "Not",
-                    listOf(
-                            Node.Assignment("in", "notab"),
-                            Node.Assignment("out", "out")
-                    )
-            )
-    )
-    Node.Chip("Or", ins, outs, components)
+    val components = (0..15).map {
+        Node.Component(
+                "Not",
+                listOf(Node.Assignment(
+                        Node.Pin("in", it),
+                        Node.Pin("out", it)
+                ))
+        )
+    }
+    Node.Chip("Not16", ins, outs, components)
 }()

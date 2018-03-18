@@ -24,14 +24,15 @@ class Generator {
                 component.assignments.forEach { assignment ->
                     val rhsGate = gates[assignment.rhs] ?: throw IllegalArgumentException("RHS not found in component assignment.")
 
-                    when (assignment.lhs) {
+                    // TODO: Correct this. Need to use index, and not just name.
+                    when (assignment.lhs.name) {
                         in componentInGates -> {
-                            val lhsGate = componentInGates[assignment.lhs]!!
+                            val lhsGate = componentInGates[assignment.lhs.name]!!
                             lhsGate.in1 = rhsGate
                             rhsGate.outputs.add(lhsGate)
                         }
                         in componentOutGates -> {
-                            val lhsGate = componentOutGates[assignment.lhs]!!
+                            val lhsGate = componentOutGates[assignment.lhs.name]!!
                             rhsGate.in1 = lhsGate
                             lhsGate.outputs.add(rhsGate)
                         }

@@ -26,20 +26,20 @@ internal class Parser {
         return chipName
     }
 
-    private fun parseIns(): List<Node.Pin> {
+    private fun parseIns(): List<Node.IOPin> {
         if (tokens[pos] != "IN") throw IllegalArgumentException("Expected token IN, got token ${tokens[pos]}.")
         pos++
         return parsePins("OUT")
     }
 
-    private fun parseOuts(): List<Node.Pin> {
+    private fun parseOuts(): List<Node.IOPin> {
         if (tokens[pos] != "OUT") throw IllegalArgumentException("Expected token OUT, got token ${tokens[pos]}.")
         pos++
         return parsePins("PARTS:")
     }
 
-    private fun parsePins(trailingWord: String): List<Node.Pin> {
-        val ins = mutableListOf<Node.Pin>()
+    private fun parsePins(trailingWord: String): List<Node.IOPin> {
+        val ins = mutableListOf<Node.IOPin>()
         // Using this check instead of `true` correctly handles the case of
         // no inputs.
         while (tokens[pos] != ";") {
@@ -55,7 +55,7 @@ internal class Parser {
                 1
             }
 
-            val input = Node.Pin(inName, inWidth)
+            val input = Node.IOPin(inName, inWidth)
             ins.add(input)
 
             if (tokens[pos] == ",") pos++
@@ -92,12 +92,12 @@ internal class Parser {
 
         val assigments = mutableListOf<Node.Assignment>()
         while (true) {
-            val lhs = tokens[pos++]
+            val lhs = Node.Pin(tokens[pos++], 0)
 
             if (tokens[pos] != "=") throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
             pos++
 
-            val rhs = tokens[pos++]
+            val rhs = Node.Pin(tokens[pos++], 0)
 
             val assignment = Node.Assignment(lhs, rhs)
             assigments.add(assignment)
