@@ -94,6 +94,29 @@ class IntegrationTests {
     // Test of a small recursive gate.
     @Test
     fun dffTest() {
-        TODO("Write flip-flop test.")
+        simulator.loadChip("DFF")
+
+        simulator.evaluateChip(listOf("data" to false, "clock" to false))
+        assertEquals(false, simulator.readValue("out"))
+
+        // Output is locked while clock is tocked.
+        simulator.evaluateChip(listOf("data" to true, "clock" to false))
+        assertEquals(false, simulator.readValue("out"))
+
+        // Output updates when clock ticks.
+        simulator.evaluateChip(listOf("data" to true, "clock" to true))
+        assertEquals(true, simulator.readValue("out"))
+
+        // Output is locked while clock is ticked.
+        simulator.evaluateChip(listOf("data" to false, "clock" to true))
+        assertEquals(true, simulator.readValue("out"))
+
+        // Output doesn't update when clock tocks.
+        simulator.evaluateChip(listOf("data" to false, "clock" to false))
+        assertEquals(true, simulator.readValue("out"))
+
+        // Output updates when clock ticks.
+        simulator.evaluateChip(listOf("data" to false, "clock" to true))
+        assertEquals(false, simulator.readValue("out"))
     }
 }
