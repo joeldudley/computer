@@ -1,4 +1,4 @@
-package hdlsimulator
+package hardwaresimulator
 
 // A logic gate.
 sealed class Gate {

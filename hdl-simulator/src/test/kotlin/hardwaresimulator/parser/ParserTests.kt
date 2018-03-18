@@ -1,6 +1,6 @@
-package hdlsimulator.parser
+package hardwaresimulator.parser
 
-import hdlsimulator.*
+import hardwaresimulator.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException

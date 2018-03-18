@@ -1,8 +1,8 @@
-package hdlsimulator.generator
+package hardwaresimulator.generator
 
-import hdlsimulator.ChipIOGates
-import hdlsimulator.PassthroughGate
-import hdlsimulator.parser.Node
+import hardwaresimulator.ChipIOGates
+import hardwaresimulator.PassthroughGate
+import hardwaresimulator.parser.Node
 
 class Generator {
     fun generateChipFun(chip: Node.Chip, chipFuns: Map<String, () -> ChipIOGates>): () -> ChipIOGates {

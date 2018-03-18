@@ -1,8 +1,8 @@
-package hdlsimulator
+package hardwaresimulator
 
-import hdlsimulator.generator.Generator
-import hdlsimulator.parser.Parser
-import hdlsimulator.tokeniser.Tokeniser
+import hardwaresimulator.generator.Generator
+import hardwaresimulator.parser.Parser
+import hardwaresimulator.tokeniser.Tokeniser
 import java.io.File
 
 val LOOPS_TO_INITIALISE = 3
@@ -15,7 +15,7 @@ data class ChipIOGates(val inGates: Map<String, Gate>, val outGates: Map<String,
  *
  * Can generate a Nand gate, plus any chips described in HDL format in the resources folder.
  */
-class HdlSimulator(chipDefFolders: List<String>) {
+class HardwareSimulator(chipDefFolders: List<String>) {
     // A function that generates a Nand gate.
     private val nandGenerator = fun(): ChipIOGates {
         val nandGate = NandGate()
@@ -87,7 +87,7 @@ class HdlSimulator(chipDefFolders: List<String>) {
         }
     }
 
-    fun evaluateChip(inputs: List<Pair<String, Boolean>>) {
+    fun setInputs(inputs: List<Pair<String, Boolean>>) {
         // For each input gate, if its new value is different to its existing
         // value, we set its value and get its downstream output gates.
         val outputs = inputs.flatMap { (gateName, newValue) ->
@@ -117,7 +117,7 @@ class HdlSimulator(chipDefFolders: List<String>) {
         }
     }
 
-    fun readValue(gateName: String): Boolean {
+    fun getValue(gateName: String): Boolean {
         return loadedChip.outGates[gateName]?.value ?: throw IllegalArgumentException("Unknown output gate.")
     }
 }

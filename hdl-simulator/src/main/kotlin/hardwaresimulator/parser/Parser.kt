@@ -1,4 +1,4 @@
-package hdlsimulator.parser
+package hardwaresimulator.parser
 
 internal class Parser {
     private var pos = 0

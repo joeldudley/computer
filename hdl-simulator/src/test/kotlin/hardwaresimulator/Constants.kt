@@ -1,22 +1,26 @@
-package hdlsimulator
+package hardwaresimulator
 
-import hdlsimulator.parser.Node
+import hardwaresimulator.parser.Node
+
+val NOT_HDL_TOKENS = listOf("CHIP", "Not", "{", "IN", "in", ";", "OUT", "out", ";", "PARTS:", "Nand", "(", "a", "=",
+        "in", ",", "b", "=", "in", ",", "out", "=", "out", ")", ";", "}")
+val AND_HDL_TOKENS = listOf("CHIP", "And", "{", "IN", "a", ",", "b", ";", "OUT", "out", ";", "PARTS:", "Nand", "(", "a",
+        "=", "a", ",", "b", "=", "b", ",", "out", "=", "nandout", ")", ";", "Not", "(", "in", "=", "nandout", ",",
+        "out", "=", "out", ")", ";", "}")
+val OR_HDL_TOKENS = listOf("CHIP", "Or", "{", "IN", "a", ",", "b", ";", "OUT", "out", ";", "PARTS:", "Not", "(", "in",
+        "=", "a", ",", "out", "=", "nota", ")", ";", "Not", "(", "in", "=", "b", ",", "out", "=", "notb", ")", ";",
+        "And", "(", "a", "=", "nota", ",", "b", "=", "notb", ",", "out", "=", "notab", ")", ";", "Not", "(", "in", "=",
+        "notab", ",", "out", "=", "out", ")", ";", "}")
+val NOT16_HDL_TOKENS = listOf("CHIP", "Not16", "{", "IN", "in", "[", "16", "]", ";", "OUT", "out", "[", "16", "]", ";", "PARTS:") +
+        (0..15).flatMap { listOf("Not", "(", "in", "=", "in", "[", "$it", "]", ",", "out", "=", "out", "[", "$it", "]", ")", ";") } +
+        listOf("}")
 
 val MISSING_INS_SEMICOLON_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", "OUT", "out", ";", "PARTS:", "Nand", "(", "a",
-        "=", "in", "b", "=", "in", "out", "=", "out", ")", "}")
+        "=", "in", ",", "b", "=", "in", ",", "out", "=", "out", ")", "}")
 val MISSING_OUTS_SEMICOLON_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", ";", "OUT", "out", "PARTS:", "Nand", "(", "a",
         "=", "in", "b", "=", "in", "out", "=", "out", ")", "}")
-val MISSING_COMPONENT_SEMICOLON_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", ";", "OUT", "out", ";", "PARTS:", "Nand", "(", "a",
-        "=", "in", "b", "=", "in", "out", "=", "out", ")", "}")
-val NOT_HDL_TOKENS = listOf("CHIP", "Not", "{", "IN", "in", ";", "OUT", "out", ";", "PARTS:", "Nand", "(", "a",
-        "=", "in", "b", "=", "in", "out", "=", "out", ")", ";", "}")
-val AND_HDL_TOKENS = listOf("CHIP", "And", "{", "IN", "a", "b", ";", "OUT", "out", ";", "PARTS:", "Nand", "(",
-        "a", "=", "a", "b", "=", "b", "out", "=", "nandout", ")", ";", "Not", "(", "in", "=", "nandout",
-        "out", "=", "out", ")", ";", "}")
-val OR_HDL_TOKENS = listOf("CHIP", "Or", "{", "IN", "a", "b", ";", "OUT", "out", ";", "PARTS:", "Not", "(", "in",
-        "=", "a", "out", "=", "nota", ")", ";", "Not", "(", "in", "=", "b", "out", "=", "notb", ")", ";", "And", "(",
-        "a", "=", "nota", "b", "=", "notb", "out", "=", "notab", ")", ";", "Not", "(", "in", "=", "notab", "out", "=",
-        "out", ")", ";", "}")
+val MISSING_COMPONENT_SEMICOLON_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", ";", "OUT", "out", ";", "PARTS:",
+        "Nand", "(", "a", "=", "in", "b", "=", "in", "out", "=", "out", ")", "}")
 
 val NOT_CHIP = {
     val ins = listOf("in")
