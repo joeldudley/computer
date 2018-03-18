@@ -50,7 +50,7 @@ class ParserTests {
         parser.setInput(MISSING_INS_SEMICOLON_TOKENS)
 
         exception.expect(IllegalArgumentException::class.java)
-        exception.expectMessage("Missing semi-colon after inputs.")
+        exception.expectMessage("Missing semi-colon after pins.")
         parser.parse()
     }
 
@@ -60,7 +60,7 @@ class ParserTests {
         parser.setInput(MISSING_OUTS_SEMICOLON_TOKENS)
 
         exception.expect(IllegalArgumentException::class.java)
-        exception.expectMessage("Missing semi-colon after outputs.")
+        exception.expectMessage("Missing semi-colon after pins.")
         parser.parse()
     }
 
@@ -71,6 +71,46 @@ class ParserTests {
 
         exception.expect(IllegalArgumentException::class.java)
         exception.expectMessage("Missing semi-colon after component name.")
+        parser.parse()
+    }
+
+    // Test of a missing 'CHIP' token.
+    @Test
+    fun missingChipTokenTest() {
+        parser.setInput(MISSING_CHIP_TOKEN_TOKENS)
+
+        exception.expect(IllegalArgumentException::class.java)
+        exception.expectMessage("Expected token CHIP, got token NA.")
+        parser.parse()
+    }
+
+    // Test of a missing 'IN' token.
+    @Test
+    fun missingInTokenTest() {
+        parser.setInput(MISSING_IN_TOKEN_TOKENS)
+
+        exception.expect(IllegalArgumentException::class.java)
+        exception.expectMessage("Expected token IN, got token in.")
+        parser.parse()
+    }
+
+    // Test of a missing 'OUT' token.
+    @Test
+    fun missingOutTokenTest() {
+        parser.setInput(MISSING_OUT_TOKEN_TOKENS)
+
+        exception.expect(IllegalArgumentException::class.java)
+        exception.expectMessage("Expected token OUT, got token out.")
+        parser.parse()
+    }
+
+    // Test of a missing 'PARTS' token.
+    @Test
+    fun missingPartsTokenTest() {
+        parser.setInput(MISSING_PARTS_TOKEN_TOKENS)
+
+        exception.expect(IllegalArgumentException::class.java)
+        exception.expectMessage("Expected token PARTS:, got token Nand.")
         parser.parse()
     }
 

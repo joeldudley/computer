@@ -3,16 +3,11 @@ package hardwaresimulator.parser
 sealed class Node {
     data class Chip(
             val name: String,
-            val ins: List<Input>,
-            val outs: List<Output>,
+            val ins: List<Pin>,
+            val outs: List<Pin>,
             val components: List<Component>)
 
-    data class Input(
-            val name: String,
-            val width: Int
-    )
-
-    data class Output(
+    data class Pin(
             val name: String,
             val width: Int
     )

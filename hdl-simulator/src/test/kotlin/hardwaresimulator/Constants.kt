@@ -21,13 +21,17 @@ val MISSING_OUTS_SEMICOLON_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", ";", "
         "a", "=", "in", ",", "b", "=", "in", ",", "out", "=", "out", ")", "}")
 val MISSING_COMPONENT_SEMICOLON_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", ";", "OUT", "out", ";", "PARTS:",
         "Nand", "(", "a", "=", "in", ",", "b", "=", "in", ",", "out", "=", "out", ")", "}")
+val MISSING_CHIP_TOKEN_TOKENS = listOf("NA")
+val MISSING_IN_TOKEN_TOKENS = listOf("CHIP", "NA", "{", "in")
+val MISSING_OUT_TOKEN_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", ";", "out")
+val MISSING_PARTS_TOKEN_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", ";", "OUT", "out", ";", "Nand")
 
 val NOT_CHIP = {
     val ins = listOf(
-            Node.Input("in", 1)
+            Node.Pin("in", 1)
     )
     val outs = listOf(
-            Node.Output("out", 1)
+            Node.Pin("out", 1)
     )
     val components = listOf(
             Node.Component(
@@ -44,11 +48,11 @@ val NOT_CHIP = {
 
 val AND_CHIP = {
     val ins = listOf(
-            Node.Input("a", 1),
-            Node.Input("b", 1)
+            Node.Pin("a", 1),
+            Node.Pin("b", 1)
     )
     val outs = listOf(
-            Node.Output("out", 1)
+            Node.Pin("out", 1)
     )
     val components = listOf(
             Node.Component(
@@ -72,11 +76,11 @@ val AND_CHIP = {
 
 val OR_CHIP = {
     val ins = listOf(
-            Node.Input("a", 1),
-            Node.Input("b", 1)
+            Node.Pin("a", 1),
+            Node.Pin("b", 1)
     )
     val outs = listOf(
-            Node.Output("out", 1)
+            Node.Pin("out", 1)
     )
     val components = listOf(
             Node.Component(
@@ -115,10 +119,10 @@ val OR_CHIP = {
 // TODO: Update.
 val NOT16_CHIP = {
     val ins = listOf(
-            Node.Input("in", 16)
+            Node.Pin("in", 16)
     )
     val outs = listOf(
-            Node.Output("out", 16)
+            Node.Pin("out", 16)
     )
     val components = listOf(
             Node.Component(
