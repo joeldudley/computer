@@ -43,7 +43,9 @@ internal class Parser {
         pos++
         val ins = mutableListOf<String>()
         while (tokens[pos] != ";") {
-            // TODO: Handle missing semicolon.
+            if (tokens[pos] == "OUT") {
+                throw IllegalArgumentException("Missing semi-colon after inputs.")
+            }
             val inName = tokens[pos]
             ins.add(inName)
             pos++
@@ -57,7 +59,9 @@ internal class Parser {
         pos++
         val ins = mutableListOf<String>()
         while (tokens[pos] != ";") {
-            // TODO: Handle missing semicolon.
+            if (tokens[pos] == "PARTS:") {
+                throw IllegalArgumentException("Missing semi-colon after outputs.")
+            }
             val inName = tokens[pos]
             ins.add(inName)
             pos++
