@@ -15,6 +15,7 @@ internal class Parser {
         val outs = parseOuts()
         parseParts()
 
+        // TODO: Refactor this into parseParts
         val components = mutableListOf<Node.Component>()
         while (pos < tokens.size) {
             if (tokens[pos] == "}") {
@@ -38,36 +39,67 @@ internal class Parser {
         return chipName
     }
 
-    private fun parseIns(): List<String> {
+    private fun parseIns(): List<Node.Input> {
         if (tokens[pos] != "IN") throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
         pos++
-        val ins = mutableListOf<String>()
-        while (tokens[pos] != ";") {
-            if (tokens[pos] == "OUT") {
-                throw IllegalArgumentException("Missing semi-colon after inputs.")
-            }
+        val ins = mutableListOf<Node.Input>()
+        while (true) {
             val inName = tokens[pos]
-            ins.add(inName)
             pos++
+
+            val inWidth = if (tokens[pos] == "[") {
+                // Skip the opening square bracket.
+                pos++
+                tokens[pos].toInt()
+                pos++
+                // Skip the closing square bracket.
+                pos++
+            } else {
+                1
+            }
+
+            val input = Node.Input(inName, inWidth)
+            ins.add(input)
+
+            if (tokens[pos] == ",") pos++
+            else if (tokens[pos] == ";") break
+            else if (tokens[pos] == "OUT") throw IllegalArgumentException("Missing semi-colon after inputs.")
+            else throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
         }
+
         pos++
         return ins
     }
 
-    private fun parseOuts(): List<String> {
-        if (tokens[pos] != "OUT") throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
+    private fun parseOuts(): List<Node.Output> {
         pos++
-        val ins = mutableListOf<String>()
-        while (tokens[pos] != ";") {
-            if (tokens[pos] == "PARTS:") {
-                throw IllegalArgumentException("Missing semi-colon after outputs.")
-            }
-            val inName = tokens[pos]
-            ins.add(inName)
+        val outs = mutableListOf<Node.Output>()
+        while (true) {
+            val outName = tokens[pos]
             pos++
+
+            val outWidth = if (tokens[pos] == "[") {
+                // Skip the opening square bracket.
+                pos++
+                tokens[pos].toInt()
+                pos++
+                // Skip the closing square bracket.
+                pos++
+            } else {
+                1
+            }
+
+            val output = Node.Output(outName, outWidth)
+            outs.add(output)
+
+            if (tokens[pos] == ",") pos++
+            else if (tokens[pos] == ";") break
+            else if (tokens[pos] == "PARTS:") throw IllegalArgumentException("Missing semi-colon after outputs.")
+            else throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
         }
+
         pos++
-        return ins
+        return outs
     }
 
     private fun parseParts() {
@@ -82,15 +114,23 @@ internal class Parser {
         pos++
 
         val assigments = mutableListOf<Node.Assignment>()
-        while (tokens[pos] != ")") {
+        while (true) {
             val lhs = tokens[pos]
             pos++
+
             if (tokens[pos] != "=") throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
             pos++
+
             val rhs = tokens[pos]
             pos++
+
             val assignment = Node.Assignment(lhs, rhs)
             assigments.add(assignment)
+
+            val nextToken = tokens[pos]
+            if (nextToken == ",") pos++
+            else if (nextToken == ")") break
+            else throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
         }
         pos++
         if (tokens[pos] != ";") throw IllegalArgumentException("Missing semi-colon after component name.")

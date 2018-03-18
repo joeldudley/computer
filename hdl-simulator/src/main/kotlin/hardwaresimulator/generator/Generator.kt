@@ -40,7 +40,11 @@ class Generator {
                 }
             }
 
-            return ChipIOGates(ins, outs)
+            return ChipIOGates(
+                    // TODO: Clear this up.
+                    ins.map { it.key.name to it.value }.toMap(),
+                    outs.map { it.key.name to it.value }.toMap()
+            )
         }
     }
 }

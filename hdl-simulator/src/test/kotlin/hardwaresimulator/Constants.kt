@@ -5,26 +5,30 @@ import hardwaresimulator.parser.Node
 val NOT_HDL_TOKENS = listOf("CHIP", "Not", "{", "IN", "in", ";", "OUT", "out", ";", "PARTS:", "Nand", "(", "a", "=",
         "in", ",", "b", "=", "in", ",", "out", "=", "out", ")", ";", "}")
 val AND_HDL_TOKENS = listOf("CHIP", "And", "{", "IN", "a", ",", "b", ";", "OUT", "out", ";", "PARTS:", "Nand", "(", "a",
-        "=", "a", ",", "b", "=", "b", ",", "out", "=", "nandout", ")", ";", "Not", "(", "in", "=", "nandout", ",",
+        "=", "a", ",", "b", "=", "b", ",", "out", "=", "nandOut", ")", ";", "Not", "(", "in", "=", "nandOut", ",",
         "out", "=", "out", ")", ";", "}")
 val OR_HDL_TOKENS = listOf("CHIP", "Or", "{", "IN", "a", ",", "b", ";", "OUT", "out", ";", "PARTS:", "Not", "(", "in",
-        "=", "a", ",", "out", "=", "nota", ")", ";", "Not", "(", "in", "=", "b", ",", "out", "=", "notb", ")", ";",
-        "And", "(", "a", "=", "nota", ",", "b", "=", "notb", ",", "out", "=", "notab", ")", ";", "Not", "(", "in", "=",
-        "notab", ",", "out", "=", "out", ")", ";", "}")
+        "=", "a", ",", "out", "=", "notA", ")", ";", "Not", "(", "in", "=", "b", ",", "out", "=", "notB", ")", ";",
+        "And", "(", "a", "=", "notA", ",", "b", "=", "notB", ",", "out", "=", "notAB", ")", ";", "Not", "(", "in", "=",
+        "notAB", ",", "out", "=", "out", ")", ";", "}")
 val NOT16_HDL_TOKENS = listOf("CHIP", "Not16", "{", "IN", "in", "[", "16", "]", ";", "OUT", "out", "[", "16", "]", ";", "PARTS:") +
         (0..15).flatMap { listOf("Not", "(", "in", "=", "in", "[", "$it", "]", ",", "out", "=", "out", "[", "$it", "]", ")", ";") } +
         listOf("}")
 
 val MISSING_INS_SEMICOLON_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", "OUT", "out", ";", "PARTS:", "Nand", "(", "a",
         "=", "in", ",", "b", "=", "in", ",", "out", "=", "out", ")", "}")
-val MISSING_OUTS_SEMICOLON_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", ";", "OUT", "out", "PARTS:", "Nand", "(", "a",
-        "=", "in", "b", "=", "in", "out", "=", "out", ")", "}")
+val MISSING_OUTS_SEMICOLON_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", ";", "OUT", "out", "PARTS:", "Nand", "(",
+        "a", "=", "in", ",", "b", "=", "in", ",", "out", "=", "out", ")", "}")
 val MISSING_COMPONENT_SEMICOLON_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", ";", "OUT", "out", ";", "PARTS:",
-        "Nand", "(", "a", "=", "in", "b", "=", "in", "out", "=", "out", ")", "}")
+        "Nand", "(", "a", "=", "in", ",", "b", "=", "in", ",", "out", "=", "out", ")", "}")
 
 val NOT_CHIP = {
-    val ins = listOf("in")
-    val outs = listOf("out")
+    val ins = listOf(
+            Node.Input("in", 1)
+    )
+    val outs = listOf(
+            Node.Output("out", 1)
+    )
     val components = listOf(
             Node.Component(
                     "Nand",
@@ -39,21 +43,26 @@ val NOT_CHIP = {
 }()
 
 val AND_CHIP = {
-    val ins = listOf("a", "b")
-    val outs = listOf("out")
+    val ins = listOf(
+            Node.Input("a", 1),
+            Node.Input("b", 1)
+    )
+    val outs = listOf(
+            Node.Output("out", 1)
+    )
     val components = listOf(
             Node.Component(
                     "Nand",
                     listOf(
                             Node.Assignment("a", "a"),
                             Node.Assignment("b", "b"),
-                            Node.Assignment("out", "nandout")
+                            Node.Assignment("out", "nandOut")
                     )
             ),
             Node.Component(
                     "Not",
                     listOf(
-                            Node.Assignment("in", "nandout"),
+                            Node.Assignment("in", "nandOut"),
                             Node.Assignment("out", "out")
                     )
             )
@@ -62,8 +71,55 @@ val AND_CHIP = {
 }()
 
 val OR_CHIP = {
-    val ins = listOf("a", "b")
-    val outs = listOf("out")
+    val ins = listOf(
+            Node.Input("a", 1),
+            Node.Input("b", 1)
+    )
+    val outs = listOf(
+            Node.Output("out", 1)
+    )
+    val components = listOf(
+            Node.Component(
+                    "Not",
+                    listOf(
+                            Node.Assignment("in", "a"),
+                            Node.Assignment("out", "notA")
+                    )
+            ),
+            Node.Component(
+                    "Not",
+                    listOf(
+                            Node.Assignment("in", "b"),
+                            Node.Assignment("out", "notB")
+                    )
+            ),
+            Node.Component(
+                    "And",
+                    listOf(
+                            Node.Assignment("a", "notA"),
+                            Node.Assignment("b", "notB"),
+                            Node.Assignment("out", "notAB")
+                    )
+            ),
+            Node.Component(
+                    "Not",
+                    listOf(
+                            Node.Assignment("in", "notAB"),
+                            Node.Assignment("out", "out")
+                    )
+            )
+    )
+    Node.Chip("Or", ins, outs, components)
+}()
+
+// TODO: Update.
+val NOT16_CHIP = {
+    val ins = listOf(
+            Node.Input("in", 16)
+    )
+    val outs = listOf(
+            Node.Output("out", 16)
+    )
     val components = listOf(
             Node.Component(
                     "Not",

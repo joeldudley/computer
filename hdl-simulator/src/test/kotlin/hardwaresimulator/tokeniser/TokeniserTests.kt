@@ -8,8 +8,6 @@ import org.junit.Test
 import java.io.File
 import kotlin.test.assertEquals
 
-// TODO: Keep commas in tokens - useful for disambig - and update the tests.
-
 class TokeniserTests {
     private val tokeniser = Tokeniser()
 
