@@ -5,6 +5,8 @@ import hdlsimulator.parser.Parser
 import hdlsimulator.tokeniser.Tokeniser
 import java.io.File
 
+val LOOPS_TO_INITIALISE = 3
+
 // Maps input and output gate names to input and output gates for a chip.
 data class ChipIOGates(val inGates: Map<String, Gate>, val outGates: Map<String, Gate>)
 
@@ -44,8 +46,8 @@ class HdlSimulator(chipDefFolders: List<String>) {
 
     init {
         chipDefFolders.forEach { folder ->
-            File(folder).listFiles().forEach {
-                file -> addChipGenerator(file)
+            File(folder).listFiles().forEach { file ->
+                addChipGenerator(file)
             }
         }
     }
@@ -61,22 +63,56 @@ class HdlSimulator(chipDefFolders: List<String>) {
 
     fun loadChip(name: String) {
         loadedChip = chipGenerators[name]?.invoke() ?: throw IllegalArgumentException("Unknown chip.")
+        initialiseChip()
+    }
+
+    private fun initialiseChip() {
+        loadedChip.inGates.values.forEach { gate -> gate.value = false }
+
+        repeat(LOOPS_TO_INITIALISE) {
+            val outputs = loadedChip.inGates.values.flatMap { gate -> gate.outputs }.toMutableList()
+
+            var i = 0
+            while (i < outputs.size) {
+                val output = outputs[i]
+                val newValue = output.calculateNewValue()
+                output.value = newValue
+                output.outputs.forEach { newOutput ->
+                    if (newOutput !in outputs) {
+                        outputs.add(newOutput)
+                    }
+                }
+                i++
+            }
+        }
     }
 
     fun evaluateChip(inputs: List<Pair<String, Boolean>>) {
-        // We set the value of each input gate and get the downstream output gates.
+        // For each input gate, if its new value is different to its existing
+        // value, we set its value and get its downstream output gates.
         val outputs = inputs.flatMap { (gateName, newValue) ->
             val gate = loadedChip.inGates[gateName] ?: throw IllegalArgumentException("Unknown input gate.")
-            gate.value = newValue
-            gate.outputs
+            // When first initialising the circuit, we cannot take the
+            // shortcut of only updating the gates that have changed.
+            if (gate.value != newValue) {
+                gate.value = newValue
+                gate.outputs
+            } else {
+                listOf<Gate>()
+            }
         }.toMutableList()
 
-        // We recursively update the downstream outputs.
+        // For each output, if its new value is different to its existing
+        // value, we set its value and recursively update its downstream
+        // output gates using the same approach.
         var i = 0
         while (i < outputs.size) {
             val output = outputs[i]
-            output.update()
-            outputs.addAll(output.outputs)
+            val newValue = output.calculateNewValue()
+            if (output.value != newValue) {
+                output.value = newValue
+                outputs.addAll(output.outputs)
+            }
             i++
         }
     }

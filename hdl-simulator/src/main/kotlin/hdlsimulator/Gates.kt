@@ -4,16 +4,16 @@ package hdlsimulator
 sealed class Gate {
     lateinit var in1: Gate
     val outputs = mutableListOf<Gate>()
-    var value = false
+    var value: Boolean = false
 
-    abstract fun update()
+    abstract fun calculateNewValue(): Boolean
 }
 
 // A logic gate with a single input pin and a single output pin.
 // value = in1.value
 class PassthroughGate: Gate() {
-    override fun update() {
-        value = in1.value
+    override fun calculateNewValue(): Boolean {
+        return in1.value
     }
 }
 
@@ -22,7 +22,7 @@ class PassthroughGate: Gate() {
 class NandGate : Gate() {
     lateinit var in2: Gate
 
-    override fun update() {
-        value = !(in1.value && in2.value)
+    override fun calculateNewValue(): Boolean {
+        return !(in1.value && in2.value)
     }
 }

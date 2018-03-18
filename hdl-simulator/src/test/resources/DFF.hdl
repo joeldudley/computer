@@ -8,7 +8,10 @@ CHIP DFF {
     OUT out;
 
     PARTS:
-
+    Nand(a=nand3Out, b=nand2Out, out=nand1Out);
+    Nand(a=nand1Out, b=clock, out=nand2Out);
+    Nand(a=nand3WayOut, b=data, out=nand3Out);
+    Nand(a=nand2Out, b=nand5Out, out=nand4Out, out=out);
+    Nand(a=nand4Out, b=nand3WayOut, out=nand5Out);
+    Nand3Way(a=nand2Out, b=clock, c=nand3Out, out=nand3WayOut);
 }
-
-TODO("Write parts based on https://en.wikipedia.org/wiki/Flip-flop_(electronics)#/media/File:Edge_triggered_D_flip_flop.svg.")
