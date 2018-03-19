@@ -42,4 +42,6 @@ class TokeniserTests {
         val tokens = tokeniser.tokenize(input)
         assertEquals(NOT16_HDL_TOKENS, tokens)
     }
+
+    // TODO: Test of unterminated multi-line comment.
 }
