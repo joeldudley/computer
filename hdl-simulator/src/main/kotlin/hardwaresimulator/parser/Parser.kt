@@ -55,12 +55,13 @@ internal class Parser {
     }
 
     /**
-     * Parses the chip's pins, in the form "PARTS <Part1>, ..., <PartN> }",
-     * where each part has the form "<CompName>(<Lhs1>=<Rhs1>, ..., <LhsN>=<RhsN>);".
+     * Parses the chip's input and output pin lists, in the form "<In1>, ..., <InN>;".
      *
-     * @return The parts.
+     * @param trailingWord The token which indicates the final semi-colon was
+     *   missing and the parser has overrun.
+     * @return The pins.
      */
-    private fun parsePins(trailingWord: String): List<Node.IOPin> {
+    private fun parsePins(trailingToken: String): List<Node.IOPin> {
         val pins = mutableListOf<Node.IOPin>()
         // Using this check instead of `true` correctly handles the case of
         // no inputs.
@@ -83,7 +84,7 @@ internal class Parser {
 
             if (tokens[pos] == ",") pos++
             else if (tokens[pos] == ";") break
-            else if (tokens[pos] == trailingWord) throw IllegalArgumentException("Missing semi-colon after pins.")
+            else if (tokens[pos] == trailingToken) throw IllegalArgumentException("Missing semi-colon after pins.")
             else throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
         }
 
@@ -114,6 +115,11 @@ internal class Parser {
         return parts
     }
 
+    /**
+     * Parses an individual part, in the form "<PartName>(<Lhs1>=<Rhs1>, ..., <LhsN>=<RhsN>);".
+     *
+     * @return The part.
+     */
     private fun parsePart(): Node.Part {
         val partName = tokens[pos++]
         if (tokens[pos] != "(") throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
