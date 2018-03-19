@@ -36,7 +36,9 @@ class ParserTests {
         assertEquals(OR_CHIP, tree)
     }
 
-    // Test of a gate with wide inputs and outputs.
+    // TODO: Split this into more targeted tests by using dummy chips (correct width gathered in each part, input only has width, output only has width, lhs width, rhs width)
+    // Test of a gate with wide inputs and outputs, and wide RHSs in the
+    // components.
     @Test
     fun not16Test() {
         parser.setInput(NOT16_HDL_TOKENS)

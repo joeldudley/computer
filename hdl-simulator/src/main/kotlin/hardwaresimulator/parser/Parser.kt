@@ -39,33 +39,35 @@ internal class Parser {
     }
 
     private fun parsePins(trailingWord: String): List<Node.IOPin> {
-        val ins = mutableListOf<Node.IOPin>()
+        val pins = mutableListOf<Node.IOPin>()
         // Using this check instead of `true` correctly handles the case of
         // no inputs.
         while (tokens[pos] != ";") {
-            val inName = tokens[pos++]
+            val pinName = tokens[pos++]
 
-            val inWidth = if (tokens[pos] == "[") {
+            val pinWidth = if (tokens[pos] == "[") {
                 // Skip the opening square bracket.
                 pos++
-                tokens[pos++].toInt()
+                val width = tokens[pos++].toInt()
                 // Skip the closing square bracket.
                 pos++
+                width
             } else {
                 1
             }
 
-            val input = Node.IOPin(inName, inWidth)
-            ins.add(input)
+            val pin = Node.IOPin(pinName, pinWidth)
+            pins.add(pin)
 
-            if (tokens[pos] == ",") pos++
-            else if (tokens[pos] == ";") break
-            else if (tokens[pos] == trailingWord) throw IllegalArgumentException("Missing semi-colon after pins.")
-            else throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
+            val nextToken = tokens[pos]
+            if (nextToken == ",") pos++
+            else if (nextToken == ";") break
+            else if (nextToken == trailingWord) throw IllegalArgumentException("Missing semi-colon after pins.")
+            else throw IllegalArgumentException("Malformed input: $nextToken.")
         }
 
         pos++
-        return ins
+        return pins
     }
 
     private fun parseParts(): List<Node.Component> {
@@ -97,7 +99,20 @@ internal class Parser {
             if (tokens[pos] != "=") throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
             pos++
 
-            val rhs = Node.Pin(tokens[pos++], 0)
+            val rhsName = tokens[pos++]
+
+            val rhsIndex = if (tokens[pos] == "[") {
+                // Skip the opening square bracket.
+                pos++
+                val index = tokens[pos++].toInt()
+                // Skip the closing square bracket.
+                pos++
+                index
+            } else {
+                0
+            }
+
+            val rhs = Node.Pin(rhsName, rhsIndex)
 
             val assignment = Node.Assignment(lhs, rhs)
             assigments.add(assignment)
@@ -105,7 +120,7 @@ internal class Parser {
             val nextToken = tokens[pos]
             if (nextToken == ",") pos++
             else if (nextToken == ")") break
-            else throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
+            else throw IllegalArgumentException("Malformed input: $nextToken.")
         }
         pos++
         if (tokens[pos] != ";") throw IllegalArgumentException("Missing semi-colon after component name.")

@@ -183,9 +183,13 @@ val NOT16_CHIP = {
     )
     val components = (0..15).map {
         Node.Component(
-                "Not",
-                listOf(Node.Assignment(
-                        Node.Pin("in", it),
+                "Not", listOf(
+                Node.Assignment(
+                        Node.Pin("in", 0),
+                        Node.Pin("in", it)
+                ),
+                Node.Assignment(
+                        Node.Pin("out", 0),
                         Node.Pin("out", it)
                 ))
         )
