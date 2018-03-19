@@ -19,7 +19,7 @@ val MISSING_INS_SEMICOLON_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", "OUT", 
         "=", "in", ",", "b", "=", "in", ",", "out", "=", "out", ")", "}")
 val MISSING_OUTS_SEMICOLON_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", ";", "OUT", "out", "PARTS:", "Nand", "(",
         "a", "=", "in", ",", "b", "=", "in", ",", "out", "=", "out", ")", "}")
-val MISSING_COMPONENT_SEMICOLON_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", ";", "OUT", "out", ";", "PARTS:",
+val MISSING_PART_SEMICOLON_TOKENS = listOf("CHIP", "NA", "{", "IN", "in", ";", "OUT", "out", ";", "PARTS:",
         "Nand", "(", "a", "=", "in", ",", "b", "=", "in", ",", "out", "=", "out", ")", "}")
 
 val MISSING_CHIP_TOKEN_TOKENS = listOf("NA")
@@ -31,7 +31,7 @@ val NO_INPUTS_TOKENS = listOf("CHIP", "Not", "{", "IN", ";", "OUT", "out", ";", 
         "in", ",", "b", "=", "in", ",", "out", "=", "out", ")", ";", "}")
 val NO_OUTPUTS_TOKENS = listOf("CHIP", "Not", "{", "IN", "in", ";", "OUT", ";", "PARTS:", "Nand", "(", "a", "=",
         "in", ",", "b", "=", "in", ",", "out", "=", "out", ")", ";", "}")
-val NO_COMPONENTS_TOKENS = listOf("CHIP", "Not", "{", "IN", "in", ";", "OUT", "out", ";", "PARTS:", "}")
+val NO_PARTS_TOKENS = listOf("CHIP", "Not", "{", "IN", "in", ";", "OUT", "out", ";", "PARTS:", "}")
 
 val NOT_CHIP = {
     val ins = listOf(
@@ -40,8 +40,8 @@ val NOT_CHIP = {
     val outs = listOf(
             Node.IOPin("out", 1)
     )
-    val components = listOf(
-            Node.Component(
+    val parts = listOf(
+            Node.Part(
                     "Nand",
                     listOf(
                             Node.Assignment(
@@ -59,7 +59,7 @@ val NOT_CHIP = {
                     )
             )
     )
-    Node.Chip("Not", ins, outs, components)
+    Node.Chip("Not", ins, outs, parts)
 }()
 
 val AND_CHIP = {
@@ -70,8 +70,8 @@ val AND_CHIP = {
     val outs = listOf(
             Node.IOPin("out", 1)
     )
-    val components = listOf(
-            Node.Component(
+    val parts = listOf(
+            Node.Part(
                     "Nand",
                     listOf(
                             Node.Assignment(
@@ -88,7 +88,7 @@ val AND_CHIP = {
                             )
                     )
             ),
-            Node.Component(
+            Node.Part(
                     "Not",
                     listOf(
                             Node.Assignment(
@@ -102,7 +102,7 @@ val AND_CHIP = {
                     )
             )
     )
-    Node.Chip("And", ins, outs, components)
+    Node.Chip("And", ins, outs, parts)
 }()
 
 val OR_CHIP = {
@@ -113,8 +113,8 @@ val OR_CHIP = {
     val outs = listOf(
             Node.IOPin("out", 1)
     )
-    val components = listOf(
-            Node.Component(
+    val parts = listOf(
+            Node.Part(
                     "Not",
                     listOf(
                             Node.Assignment(
@@ -127,7 +127,7 @@ val OR_CHIP = {
                             )
                     )
             ),
-            Node.Component(
+            Node.Part(
                     "Not",
                     listOf(
                             Node.Assignment(
@@ -140,7 +140,7 @@ val OR_CHIP = {
                             )
                     )
             ),
-            Node.Component(
+            Node.Part(
                     "And",
                     listOf(
                             Node.Assignment(
@@ -157,7 +157,7 @@ val OR_CHIP = {
                             )
                     )
             ),
-            Node.Component(
+            Node.Part(
                     "Not",
                     listOf(
                             Node.Assignment(
@@ -171,7 +171,7 @@ val OR_CHIP = {
                     )
             )
     )
-    Node.Chip("Or", ins, outs, components)
+    Node.Chip("Or", ins, outs, parts)
 }()
 
 val NOT16_CHIP = {
@@ -181,8 +181,8 @@ val NOT16_CHIP = {
     val outs = listOf(
             Node.IOPin("out", 16)
     )
-    val components = (0..15).map {
-        Node.Component(
+    val parts = (0..15).map {
+        Node.Part(
                 "Not", listOf(
                 Node.Assignment(
                         Node.Pin("in", 0),
@@ -194,5 +194,5 @@ val NOT16_CHIP = {
                 ))
         )
     }
-    Node.Chip("Not16", ins, outs, components)
+    Node.Chip("Not16", ins, outs, parts)
 }()

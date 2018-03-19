@@ -61,7 +61,7 @@ class IntegrationTests {
     }
 
     // Test of the 3-way nand gate.
-    // It's a component part of the DFF, and no solution is provided as part of Nand2Tetris.
+    // It's a part of the DFF, and no solution is provided as part of Nand2Tetris.
     @Test
     fun nand3WayTest() {
         simulator.loadChip("Nand3Way")

@@ -55,8 +55,7 @@ class HardwareSimulator(chipDefFolders: List<String>) {
     private fun addChipGenerator(file: File) {
         val fileContents = file.readText()
         val tokens = tokeniser.tokenize(fileContents)
-        parser.setInput(tokens)
-        val chip = parser.parse()
+        val chip = parser.parse(tokens)
         val chipFun = generator.generateChipFun(chip, chipGenerators)
         chipGenerators.put(chip.name, chipFun)
     }

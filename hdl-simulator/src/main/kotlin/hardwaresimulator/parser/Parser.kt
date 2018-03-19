@@ -4,19 +4,25 @@ internal class Parser {
     private var pos = 0
     private var tokens = listOf<String>()
 
-    fun setInput(tokens: List<String>) {
+    /**
+     * Parses the [tokens] into a [Node.Chip].
+     */
+    fun parse(tokens: List<String>): Node.Chip {
         pos = 0
         this.tokens = tokens
-    }
 
-    fun parse(): Node.Chip {
         val chipName = parseChipName()
-        val ins = parseIns()
-        val outs = parseOuts()
-        val components = parseParts()
-        return Node.Chip(chipName, ins, outs, components)
+        val ins = parseInputs()
+        val outs = parseOutputs()
+        val parts = parseParts()
+        return Node.Chip(chipName, ins, outs, parts)
     }
 
+    /**
+     * Parses the chip's header, in the form "CHIP <Name> {".
+     *
+     * @return The name of the chip.
+     */
     private fun parseChipName(): String {
         if (tokens[pos] != "CHIP") throw IllegalArgumentException("Expected token CHIP, got token ${tokens[pos]}.")
         pos++
@@ -26,18 +32,34 @@ internal class Parser {
         return chipName
     }
 
-    private fun parseIns(): List<Node.IOPin> {
+    /**
+     * Parses the chip's inputs, in the form "IN <In1>, ..., <InN>;".
+     *
+     * @return The inputs.
+     */
+    private fun parseInputs(): List<Node.IOPin> {
         if (tokens[pos] != "IN") throw IllegalArgumentException("Expected token IN, got token ${tokens[pos]}.")
         pos++
         return parsePins("OUT")
     }
 
-    private fun parseOuts(): List<Node.IOPin> {
+    /**
+     * Parses the chip's inputs, in the form "IN <In1>, ..., <InN>;".
+     *
+     * @return The inputs.
+     */
+    private fun parseOutputs(): List<Node.IOPin> {
         if (tokens[pos] != "OUT") throw IllegalArgumentException("Expected token OUT, got token ${tokens[pos]}.")
         pos++
         return parsePins("PARTS:")
     }
 
+    /**
+     * Parses the chip's pins, in the form "PARTS <Part1>, ..., <PartN> }",
+     * where each part has the form "<CompName>(<Lhs1>=<Rhs1>, ..., <LhsN>=<RhsN>);".
+     *
+     * @return The parts.
+     */
     private fun parsePins(trailingWord: String): List<Node.IOPin> {
         val pins = mutableListOf<Node.IOPin>()
         // Using this check instead of `true` correctly handles the case of
@@ -59,36 +81,41 @@ internal class Parser {
             val pin = Node.IOPin(pinName, pinWidth)
             pins.add(pin)
 
-            val nextToken = tokens[pos]
-            if (nextToken == ",") pos++
-            else if (nextToken == ";") break
-            else if (nextToken == trailingWord) throw IllegalArgumentException("Missing semi-colon after pins.")
-            else throw IllegalArgumentException("Malformed input: $nextToken.")
+            if (tokens[pos] == ",") pos++
+            else if (tokens[pos] == ";") break
+            else if (tokens[pos] == trailingWord) throw IllegalArgumentException("Missing semi-colon after pins.")
+            else throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
         }
 
         pos++
         return pins
     }
 
-    private fun parseParts(): List<Node.Component> {
+    /**
+     * Parses the chip's parts, in the form "PARTS <Part1>, ..., <PartN> }",
+     * where each part has the form "<PartName>(<Lhs1>=<Rhs1>, ..., <LhsN>=<RhsN>);".
+     *
+     * @return The parts.
+     */
+    private fun parseParts(): List<Node.Part> {
         if (tokens[pos] != "PARTS:") throw IllegalArgumentException("Expected token PARTS:, got token ${tokens[pos]}.")
         pos++
 
-        val components = mutableListOf<Node.Component>()
+        val parts = mutableListOf<Node.Part>()
         while (pos < tokens.size) {
             if (tokens[pos] == "}") {
                 break
             } else {
-                val component = parseComponent()
-                components.add(component)
+                val part = parsePart()
+                parts.add(part)
             }
         }
 
-        return components
+        return parts
     }
 
-    private fun parseComponent(): Node.Component {
-        val componentName = tokens[pos++]
+    private fun parsePart(): Node.Part {
+        val partName = tokens[pos++]
         if (tokens[pos] != "(") throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
         pos++
 
@@ -117,15 +144,14 @@ internal class Parser {
             val assignment = Node.Assignment(lhs, rhs)
             assigments.add(assignment)
 
-            val nextToken = tokens[pos]
-            if (nextToken == ",") pos++
-            else if (nextToken == ")") break
-            else throw IllegalArgumentException("Malformed input: $nextToken.")
+            if (tokens[pos] == ",") pos++
+            else if (tokens[pos] == ")") break
+            else throw IllegalArgumentException("Malformed input: ${tokens[pos]}.")
         }
         pos++
-        if (tokens[pos] != ";") throw IllegalArgumentException("Missing semi-colon after component name.")
+        if (tokens[pos] != ";") throw IllegalArgumentException("Missing semi-colon after part name.")
         pos++
 
-        return Node.Component(componentName, assigments)
+        return Node.Part(partName, assigments)
     }
 }

@@ -5,7 +5,7 @@ sealed class Node {
             val name: String,
             val ins: List<IOPin>,
             val outs: List<IOPin>,
-            val components: List<Component>)
+            val parts: List<Part>)
 
     data class IOPin(
             val name: String,
@@ -17,7 +17,7 @@ sealed class Node {
             val index: Int
     )
 
-    data class Component(
+    data class Part(
            val name: String,
            val assignments: List<Assignment>
     )
