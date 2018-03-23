@@ -5,9 +5,9 @@ package hardwaresimulator.parser
  */
 internal class Parser {
     // The current position in the list of tokens.
-    private var pos: Int = 0
+    private var pos = 0
     // The list of tokens to parse.
-    private lateinit var tokens: List<String>
+    private var tokens = listOf<String>()
 
     /**
      * Parses the [tokens] into a [Node.Chip].
@@ -58,7 +58,7 @@ internal class Parser {
     /**
      * Parses the chip's input and output pin lists, in the form "<In1>, ..., <InN>;".
      *
-     * @param trailingWord The token which indicates the final semi-colon was
+     * @param trailingToken The token which indicates the final semi-colon was
      *   missing and the parser has overrun.
      * @return The pins.
      */

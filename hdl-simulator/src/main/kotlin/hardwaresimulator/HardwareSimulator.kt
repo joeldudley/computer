@@ -38,7 +38,7 @@ class HardwareSimulator(chipDefFolders: List<String>) {
             "Nand" to nandGenerator
     )
     // The chip currently being simulated.
-    private lateinit var loadedChip: ChipIOGates
+    private var loadedChip: ChipIOGates? = null
 
     private val tokeniser = Tokeniser()
     private val parser = Parser()
@@ -66,10 +66,12 @@ class HardwareSimulator(chipDefFolders: List<String>) {
     }
 
     private fun initialiseChip() {
-        loadedChip.inGates.values.forEach { gate -> gate.value = false }
+        if (loadedChip == null) throw IllegalStateException("No chip loaded in the simulator.")
+
+        loadedChip!!.inGates.values.forEach { gate -> gate.value = false }
 
         repeat(LOOPS_TO_INITIALISE) {
-            val outputs = loadedChip.inGates.values.flatMap { gate -> gate.outputs }.toMutableList()
+            val outputs = loadedChip!!.inGates.values.flatMap { gate -> gate.outputs }.toMutableList()
 
             var i = 0
             while (i < outputs.size) {
@@ -87,12 +89,12 @@ class HardwareSimulator(chipDefFolders: List<String>) {
     }
 
     fun setInputs(inputs: List<Pair<String, Boolean>>) {
+        if (loadedChip == null) throw IllegalStateException("No chip loaded in the simulator.")
+
         // For each input gate, if its new value is different to its existing
         // value, we set its value and get its downstream output gates.
         val outputs = inputs.flatMap { (gateName, newValue) ->
-            val gate = loadedChip.inGates[gateName] ?: throw IllegalArgumentException("Unknown input gate.")
-            // When first initialising the circuit, we cannot take the
-            // shortcut of only updating the gates that have changed.
+            val gate = loadedChip!!.inGates[gateName] ?: throw IllegalArgumentException("Unknown input gate.")
             if (gate.value != newValue) {
                 gate.value = newValue
                 gate.outputs
@@ -117,6 +119,8 @@ class HardwareSimulator(chipDefFolders: List<String>) {
     }
 
     fun getValue(gateName: String): Boolean {
-        return loadedChip.outGates[gateName]?.value ?: throw IllegalArgumentException("Unknown output gate.")
+        if (loadedChip == null) throw IllegalStateException("No chip loaded in the simulator.")
+        val outputGate = loadedChip!!.outGates[gateName] ?: throw IllegalArgumentException("Unknown output gate.")
+        return outputGate.value
     }
 }

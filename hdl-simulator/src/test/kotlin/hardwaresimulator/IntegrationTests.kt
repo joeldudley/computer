@@ -119,4 +119,6 @@ class IntegrationTests {
         simulator.setInputs(listOf("data" to false, "clock" to true))
         assertEquals(false, simulator.getValue("out"))
     }
+
+    // TODO: Write integration test of Not16 chip.
 }

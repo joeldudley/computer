@@ -4,11 +4,11 @@ package hardwaresimulator.tokeniser
  * Parses a string representing a .hdl chip definition into a list of tokens.
  */
 internal class Tokeniser {
-    private lateinit var program: String
-    private lateinit var tokens: MutableList<String>
+    private var program = ""
+    private var tokens = mutableListOf<String>()
     private var pos = 0
     private var inWord = false
-    private lateinit var word: String
+    private var word = ""
 
     fun tokenize(program: String): List<String> {
         this.program = program

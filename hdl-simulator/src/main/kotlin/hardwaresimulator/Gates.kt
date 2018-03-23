@@ -2,7 +2,7 @@ package hardwaresimulator
 
 // A logic gate.
 sealed class Gate {
-    lateinit var in1: Gate
+    var in1: Gate? = null
     val outputs = mutableListOf<Gate>()
     var value: Boolean = false
 
@@ -11,18 +11,24 @@ sealed class Gate {
 
 // A logic gate with a single input pin and a single output pin.
 // value = in1.value
-class PassthroughGate: Gate() {
+class PassthroughGate : Gate() {
     override fun calculateNewValue(): Boolean {
-        return in1.value
+        if (in1 == null) {
+            throw IllegalStateException("One of the passthrough gate's inputs is uninitialised.")
+        }
+        return in1!!.value
     }
 }
 
 // A logic gate with two input pin and a single output pin.
 // value = in1.value nand in2.value
 class NandGate : Gate() {
-    lateinit var in2: Gate
+    var in2: Gate? = null
 
     override fun calculateNewValue(): Boolean {
-        return !(in1.value && in2.value)
+        if (in1 == null || in2 == null) {
+            throw IllegalStateException("One of the nand gate's inputs is uninitialised.")
+        }
+        return !(in1!!.value && in2!!.value)
     }
 }
