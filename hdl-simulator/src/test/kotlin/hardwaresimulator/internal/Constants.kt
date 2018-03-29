@@ -1,7 +1,5 @@
 package hardwaresimulator.internal
 
-import hardwaresimulator.internal.parser.*
-
 val NOT_HDL_TOKENS = listOf("CHIP", "Not", "{", "IN", "in", ";", "OUT", "out", ";", "PARTS:", "Nand", "(", "a", "=",
         "in", ",", "b", "=", "in", ",", "out", "=", "out", ")", ";", "}")
 val AND_HDL_TOKENS = listOf("CHIP", "And", "{", "IN", "a", ",", "b", ";", "OUT", "out", ";", "PARTS:", "Nand", "(", "a",

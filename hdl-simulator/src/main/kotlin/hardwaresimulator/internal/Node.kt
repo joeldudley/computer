@@ -1,4 +1,4 @@
-package hardwaresimulator.internal.parser
+package hardwaresimulator.internal
 
 sealed class Node
 

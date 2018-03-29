@@ -1,5 +1,7 @@
 package hardwaresimulator.internal.parser
 
+import hardwaresimulator.internal.*
+
 /**
  * Parses a list of tokens into a [Node.Chip].
  */

@@ -4,8 +4,8 @@ import hardwaresimulator.Chip
 import hardwaresimulator.internal.Gate
 import hardwaresimulator.internal.NandGate
 import hardwaresimulator.internal.PassthroughGate
-import hardwaresimulator.internal.parser.ChipNode
-import hardwaresimulator.internal.parser.PartNode
+import hardwaresimulator.internal.ChipNode
+import hardwaresimulator.internal.PartNode
 
 // TODO: Correct this. Need to use index, and not just name.
 class Generator {
@@ -23,12 +23,10 @@ class Generator {
         fun chipGenerator(): Chip {
             // Step 2.1: Map each variable name to a gate.
             val chipGates = createChipGates(chipVariableNames)
-            // Step 2.2: Create a chip.
-            val chip = Chip(chipGates.inputGates, chipGates.outputGates)
-            // Step 2.3: Create and hook up the chip's parts.
+            // Step 2.2: Create and hook up the chip's parts.
             generateAndHookUpChipParts(chipNode, chipGates.allGates)
-
-            return chip
+            // Step 2.3: Create and return chip.
+            return Chip(chipGates.inputGates, chipGates.outputGates)
         }
 
         // Step 3: Add the new chip generator to the map of chip generators.
@@ -58,7 +56,9 @@ class Generator {
         nandGate.in2 = in2
         in2.outputs.add(nandGate)
 
-        return Chip(mapOf("a" to in1, "b" to in2), mapOf("out" to nandGate))
+        val inputGateMap = mapOf("a" to in1, "b" to in2)
+        val outputGateMap = mapOf("out" to nandGate)
+        return Chip(inputGateMap, outputGateMap)
     }
 
     // Known chip generators. Initially, only NAND, the built-in chip, is known.
