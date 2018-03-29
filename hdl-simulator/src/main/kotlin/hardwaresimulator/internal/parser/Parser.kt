@@ -12,10 +12,10 @@ internal class Parser {
     /**
      * Parses the [tokens] into a [Node.Chip].
      */
-    fun parse(tokens: List<String>): Node.Chip {
+    fun parse(tokens: List<String>): Node.ChipNode {
         pos = 0
         this.tokens = tokens
-        return Node.Chip(parseChipName(), parseInputs(), parseOutputs(), parseParts())
+        return Node.ChipNode(parseChipName(), parseInputs(), parseOutputs(), parseParts())
     }
 
     /**
@@ -38,7 +38,7 @@ internal class Parser {
      *
      * @return The inputs.
      */
-    private fun parseInputs(): List<Node.IOPin> {
+    private fun parseInputs(): List<Node.IOPinNode> {
         if (tokens[pos] != "IN") throw IllegalArgumentException("Expected token IN, got token ${tokens[pos]}.")
         pos++
         return parsePins("OUT")
@@ -49,7 +49,7 @@ internal class Parser {
      *
      * @return The inputs.
      */
-    private fun parseOutputs(): List<Node.IOPin> {
+    private fun parseOutputs(): List<Node.IOPinNode> {
         if (tokens[pos] != "OUT") throw IllegalArgumentException("Expected token OUT, got token ${tokens[pos]}.")
         pos++
         return parsePins("PARTS:")
@@ -62,8 +62,8 @@ internal class Parser {
      *   missing and the parser has overrun.
      * @return The pins.
      */
-    private fun parsePins(trailingToken: String): List<Node.IOPin> {
-        val pins = mutableListOf<Node.IOPin>()
+    private fun parsePins(trailingToken: String): List<Node.IOPinNode> {
+        val pins = mutableListOf<Node.IOPinNode>()
         // Using this check instead of `true` correctly handles the case of
         // no pins.
         while (tokens[pos] != ";") {
@@ -82,7 +82,7 @@ internal class Parser {
                 1
             }
 
-            val pin = Node.IOPin(pinName, pinWidth)
+            val pin = Node.IOPinNode(pinName, pinWidth)
             pins.add(pin)
 
             if (tokens[pos] == ",") pos++
@@ -101,11 +101,11 @@ internal class Parser {
      *
      * @return The parts.
      */
-    private fun parseParts(): List<Node.Part> {
+    private fun parseParts(): List<Node.PartNode> {
         if (tokens[pos] != "PARTS:") throw IllegalArgumentException("Expected token PARTS:, got token ${tokens[pos]}.")
         pos++
 
-        val parts = mutableListOf<Node.Part>()
+        val parts = mutableListOf<Node.PartNode>()
         while (tokens[pos] != "}") {
             val part = parsePart()
             parts.add(part)
@@ -119,15 +119,15 @@ internal class Parser {
      *
      * @return The part.
      */
-    private fun parsePart(): Node.Part {
+    private fun parsePart(): Node.PartNode {
         val partName = tokens[pos]
         pos++
         if (tokens[pos] != "(") throw IllegalArgumentException("Expected token (, got token ${tokens[pos]}.")
         pos++
 
-        val assignments = mutableListOf<Node.Assignment>()
+        val assignments = mutableListOf<Node.AssignmentNode>()
         while (true) {
-            val lhs = Node.InternalPin(tokens[pos], 0)
+            val lhs = Node.InternalPinNode(tokens[pos], 0)
             pos++
 
             if (tokens[pos] != "=") throw IllegalArgumentException("Expected token =, got token ${tokens[pos]}.")
@@ -148,9 +148,9 @@ internal class Parser {
                 0
             }
 
-            val rhs = Node.InternalPin(rhsName, rhsIndex)
+            val rhs = Node.InternalPinNode(rhsName, rhsIndex)
 
-            val assignment = Node.Assignment(lhs, rhs)
+            val assignment = Node.AssignmentNode(lhs, rhs)
             assignments.add(assignment)
 
             if (tokens[pos] == ",") pos++
@@ -161,6 +161,6 @@ internal class Parser {
         if (tokens[pos] != ";") throw IllegalArgumentException("Missing semi-colon after part name.")
         pos++
 
-        return Node.Part(partName, assignments)
+        return Node.PartNode(partName, assignments)
     }
 }

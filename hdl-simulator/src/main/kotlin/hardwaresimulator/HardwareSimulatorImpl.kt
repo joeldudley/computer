@@ -9,6 +9,10 @@ import java.io.File
 
 // Maps input and output gate names to input and output gates for a chip.
 data class Chip(val inputGateMap: Map<String, Gate>, val outputGateMap: Map<String, Gate>)
+data class ChipGateMaps(
+        val inputGateMap: Map<String, Gate>,
+        val outputGateMap: Map<String, Gate>,
+        val uniqueInternalVariableGates: Map<String, Gate>)
 data class ChipInput(val name: String, val value: Boolean)
 
 /**

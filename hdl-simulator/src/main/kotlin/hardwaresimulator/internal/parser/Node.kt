@@ -1,29 +1,29 @@
 package hardwaresimulator.internal.parser
 
 sealed class Node {
-    data class Chip(
+    data class ChipNode(
             val name: String,
-            val ins: List<IOPin>,
-            val outs: List<IOPin>,
-            val parts: List<Part>)
+            val inputs: List<IOPinNode>,
+            val outputs: List<IOPinNode>,
+            val parts: List<PartNode>)
 
-    data class IOPin(
+    data class IOPinNode(
             val name: String,
             val width: Int
     )
 
-    data class InternalPin(
+    data class InternalPinNode(
             val name: String,
             val index: Int
     )
 
-    data class Part(
+    data class PartNode(
            val name: String,
-           val assignments: List<Assignment>
+           val assignments: List<AssignmentNode>
     )
 
-    data class Assignment(
-            val lhs: InternalPin,
-            val rhs: InternalPin
+    data class AssignmentNode(
+            val lhs: InternalPinNode,
+            val rhs: InternalPinNode
     )
 }
