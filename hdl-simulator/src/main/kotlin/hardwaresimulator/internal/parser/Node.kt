@@ -12,7 +12,7 @@ sealed class Node {
             val width: Int
     )
 
-    data class Pin(
+    data class InternalPin(
             val name: String,
             val index: Int
     )
@@ -23,7 +23,7 @@ sealed class Node {
     )
 
     data class Assignment(
-            val lhs: Pin,
-            val rhs: Pin
+            val lhs: InternalPin,
+            val rhs: InternalPin
     )
 }

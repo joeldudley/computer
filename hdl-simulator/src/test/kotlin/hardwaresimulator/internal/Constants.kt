@@ -45,16 +45,16 @@ val NOT_CHIP = {
                     "Nand",
                     listOf(
                             Node.Assignment(
-                                    Node.Pin("a", 0),
-                                    Node.Pin("in", 0)
+                                    Node.InternalPin("a", 0),
+                                    Node.InternalPin("in", 0)
                             ),
                             Node.Assignment(
-                                    Node.Pin("b", 0),
-                                    Node.Pin("in", 0)
+                                    Node.InternalPin("b", 0),
+                                    Node.InternalPin("in", 0)
                             ),
                             Node.Assignment(
-                                    Node.Pin("out", 0),
-                                    Node.Pin("out", 0)
+                                    Node.InternalPin("out", 0),
+                                    Node.InternalPin("out", 0)
                             )
                     )
             )
@@ -75,16 +75,16 @@ val AND_CHIP = {
                     "Nand",
                     listOf(
                             Node.Assignment(
-                                    Node.Pin("a", 0),
-                                    Node.Pin("a", 0)
+                                    Node.InternalPin("a", 0),
+                                    Node.InternalPin("a", 0)
                             ),
                             Node.Assignment(
-                                    Node.Pin("b", 0),
-                                    Node.Pin("b", 0)
+                                    Node.InternalPin("b", 0),
+                                    Node.InternalPin("b", 0)
                             ),
                             Node.Assignment(
-                                    Node.Pin("out", 0),
-                                    Node.Pin("nandOut", 0)
+                                    Node.InternalPin("out", 0),
+                                    Node.InternalPin("nandOut", 0)
                             )
                     )
             ),
@@ -92,12 +92,12 @@ val AND_CHIP = {
                     "Not",
                     listOf(
                             Node.Assignment(
-                                    Node.Pin("in", 0),
-                                    Node.Pin("nandOut", 0)
+                                    Node.InternalPin("in", 0),
+                                    Node.InternalPin("nandOut", 0)
                             ),
                             Node.Assignment(
-                                    Node.Pin("out", 0),
-                                    Node.Pin("out", 0)
+                                    Node.InternalPin("out", 0),
+                                    Node.InternalPin("out", 0)
                             )
                     )
             )
@@ -118,12 +118,12 @@ val OR_CHIP = {
                     "Not",
                     listOf(
                             Node.Assignment(
-                                    Node.Pin("in", 0),
-                                    Node.Pin("a", 0)
+                                    Node.InternalPin("in", 0),
+                                    Node.InternalPin("a", 0)
                             ),
                             Node.Assignment(
-                                    Node.Pin("out", 0),
-                                    Node.Pin("notA", 0)
+                                    Node.InternalPin("out", 0),
+                                    Node.InternalPin("notA", 0)
                             )
                     )
             ),
@@ -131,12 +131,12 @@ val OR_CHIP = {
                     "Not",
                     listOf(
                             Node.Assignment(
-                                    Node.Pin("in", 0),
-                                    Node.Pin("b", 0)
+                                    Node.InternalPin("in", 0),
+                                    Node.InternalPin("b", 0)
                             ),
                             Node.Assignment(
-                                    Node.Pin("out", 0),
-                                    Node.Pin("notB", 0)
+                                    Node.InternalPin("out", 0),
+                                    Node.InternalPin("notB", 0)
                             )
                     )
             ),
@@ -144,16 +144,16 @@ val OR_CHIP = {
                     "And",
                     listOf(
                             Node.Assignment(
-                                    Node.Pin("a", 0),
-                                    Node.Pin("notA", 0)
+                                    Node.InternalPin("a", 0),
+                                    Node.InternalPin("notA", 0)
                             ),
                             Node.Assignment(
-                                    Node.Pin("b", 0),
-                                    Node.Pin("notB", 0)
+                                    Node.InternalPin("b", 0),
+                                    Node.InternalPin("notB", 0)
                             ),
                             Node.Assignment(
-                                    Node.Pin("out", 0),
-                                    Node.Pin("notAB", 0)
+                                    Node.InternalPin("out", 0),
+                                    Node.InternalPin("notAB", 0)
                             )
                     )
             ),
@@ -161,12 +161,12 @@ val OR_CHIP = {
                     "Not",
                     listOf(
                             Node.Assignment(
-                                    Node.Pin("in", 0),
-                                    Node.Pin("notAB", 0)
+                                    Node.InternalPin("in", 0),
+                                    Node.InternalPin("notAB", 0)
                             ),
                             Node.Assignment(
-                                    Node.Pin("out", 0),
-                                    Node.Pin("out", 0)
+                                    Node.InternalPin("out", 0),
+                                    Node.InternalPin("out", 0)
                             )
                     )
             )
@@ -185,12 +185,12 @@ val NOT16_CHIP = {
         Node.Part(
                 "Not", listOf(
                 Node.Assignment(
-                        Node.Pin("in", 0),
-                        Node.Pin("in", it)
+                        Node.InternalPin("in", 0),
+                        Node.InternalPin("in", it)
                 ),
                 Node.Assignment(
-                        Node.Pin("out", 0),
-                        Node.Pin("out", it)
+                        Node.InternalPin("out", 0),
+                        Node.InternalPin("out", it)
                 ))
         )
     }

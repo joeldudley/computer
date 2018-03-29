@@ -7,11 +7,6 @@ import hardwaresimulator.internal.parser.Node
 
 // TODO: Correct this. Need to use index, and not just name.
 class Generator {
-    fun generateChip(name: String): Chip {
-        val chipGenerator = chipGenerators[name] ?: throw IllegalArgumentException("Unknown chip.")
-        return chipGenerator()
-    }
-
     // Known chip generators. Defaults to only Nand.
     private val chipGenerators = mutableMapOf("Nand" to fun(): Chip {
         val nandGate = NandGate()
@@ -27,45 +22,53 @@ class Generator {
         return Chip(mapOf("a" to in1, "b" to in2), mapOf("out" to nandGate))
     })
 
-    fun addChipDefinition(chip: Node.Chip) {
-        chipGenerators.put(chip.name, fun(): Chip {
-            // Step 1: Get the names of all the variable names in the inputs,
-            // the outputs and the part RHSs.
-            val inGateNames = chip.ins.map { it.name }
-            val outGateNames = chip.outs.map { it.name }
-            val partRHSNames = chip.parts.flatMap {
-                it.assignments.map { it.rhs.name }
-            }
+    fun generateChip(name: String): Chip {
+        val chipGenerator = chipGenerators[name] ?: throw IllegalArgumentException("Unknown chip.")
+        return chipGenerator()
+    }
 
-            // Step 2: Filter out any part RHSs variables that are actually
-            // inputs or outputs.
-            val partNonDuplicatedRHSNames = partRHSNames.filter { rhsName ->
-                rhsName !in inGateNames && rhsName !in outGateNames
-            }
+    fun addChipGenerator(chipNode: Node.Chip) {
+        // Step 1: Get the names of all the variable in the inputs, the
+        // outputs and the part RHSs.
+        val inputVariableNames = chipNode.ins.map { it.name }
+        val outputVariableNames = chipNode.outs.map { it.name }
+        val partRhsNames = chipNode.parts.flatMap { part ->
+            part.assignments.map { it.rhs.name }
+        }
 
-            // Step 3: Associate each variable name to a gate.
-            val inGates = inGateNames.map { name -> name to PassthroughGate() }.toMap()
-            val outGates = outGateNames.map { it to PassthroughGate() }.toMap()
-            val partGates = partNonDuplicatedRHSNames
-                    .map { it to PassthroughGate() }.toMap()
-            val gates = inGates + outGates + partGates
+        // Step 2: Filter out any part RHSs that are actually
+        // inputs or outputs.
+        val uniquePartRhsNames = partRhsNames.filter { rhsName ->
+            rhsName !in inputVariableNames && rhsName !in outputVariableNames
+        }
 
-            // Step 4: Hook up all the gates.
-            chip.parts.forEach { part ->
+        // Step 3: Create a new chip generator.
+        fun chipGenerator(): Chip {
+            // Step 3.1: Map each variable name to a gate.
+            val inputGateMap = inputVariableNames.map { name -> name to PassthroughGate() }.toMap()
+            val outputGateMap = outputVariableNames.map { name -> name to PassthroughGate() }.toMap()
+            val partGateMap = uniquePartRhsNames
+                    .map { name -> name to PassthroughGate() }.toMap()
+            val gateMap = inputGateMap + outputGateMap + partGateMap
+
+            // Step 3.2: Create chips for each part and hook up all the gates.
+            chipNode.parts.forEach { part ->
+                // Step 3.2.1: Create chips for each part.
                 val partGenerator = chipGenerators[part.name] ?: throw IllegalArgumentException("Unsupported chip.")
-                val (partInGates, partOutGates) = partGenerator()
+                val partChip = partGenerator()
 
+                // Step 3.2.2: Hook up all the gates.
                 part.assignments.forEach { assignment ->
-                    val rhsGate = gates[assignment.rhs.name] ?: throw IllegalArgumentException("RHS not found in part assignment.")
+                    val rhsGate = gateMap[assignment.rhs.name] ?: throw IllegalArgumentException("RHS not found in part assignment.")
 
                     when (assignment.lhs.name) {
-                        in partInGates -> {
-                            val lhsGate = partInGates[assignment.lhs.name] ?: throw IllegalArgumentException("LHS not found in part assignment.")
+                        in partChip.inputGateMap -> {
+                            val lhsGate = partChip.inputGateMap[assignment.lhs.name] ?: throw IllegalArgumentException("LHS not found in part assignment.")
                             lhsGate.in1 = rhsGate
                             rhsGate.outputs.add(lhsGate)
                         }
-                        in partOutGates -> {
-                            val lhsGate = partOutGates[assignment.lhs.name] ?: throw IllegalArgumentException("LHS not found in part assignment.")
+                        in partChip.outputGateMap -> {
+                            val lhsGate = partChip.outputGateMap[assignment.lhs.name] ?: throw IllegalArgumentException("LHS not found in part assignment.")
                             rhsGate.in1 = lhsGate
                             lhsGate.outputs.add(rhsGate)
                         }
@@ -74,7 +77,9 @@ class Generator {
                 }
             }
 
-            return Chip(inGates, outGates)
-        })
+            return Chip(inputGateMap, outputGateMap)
+        }
+
+        chipGenerators.put(chipNode.name, ::chipGenerator)
     }
 }

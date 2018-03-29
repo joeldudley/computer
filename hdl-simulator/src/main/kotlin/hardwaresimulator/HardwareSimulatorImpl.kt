@@ -29,8 +29,8 @@ class HardwareSimulatorImpl: HardwareSimulator {
             hdlFiles.forEach { file ->
                 val fileContents = file.readText()
                 val tokens = tokeniser.tokenize(fileContents)
-                val chip = parser.parse(tokens)
-                generator.addChipDefinition(chip)
+                val chipNode = parser.parse(tokens)
+                generator.addChipGenerator(chipNode)
             }
         }
     }

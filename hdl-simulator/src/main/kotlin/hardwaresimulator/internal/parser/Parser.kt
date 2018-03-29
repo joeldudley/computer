@@ -127,7 +127,7 @@ internal class Parser {
 
         val assignments = mutableListOf<Node.Assignment>()
         while (true) {
-            val lhs = Node.Pin(tokens[pos], 0)
+            val lhs = Node.InternalPin(tokens[pos], 0)
             pos++
 
             if (tokens[pos] != "=") throw IllegalArgumentException("Expected token =, got token ${tokens[pos]}.")
@@ -148,7 +148,7 @@ internal class Parser {
                 0
             }
 
-            val rhs = Node.Pin(rhsName, rhsIndex)
+            val rhs = Node.InternalPin(rhsName, rhsIndex)
 
             val assignment = Node.Assignment(lhs, rhs)
             assignments.add(assignment)
