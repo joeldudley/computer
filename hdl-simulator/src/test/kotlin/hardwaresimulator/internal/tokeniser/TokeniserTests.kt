@@ -1,9 +1,9 @@
-package hardwaresimulator.tokeniser
+package hardwaresimulator.internal.tokeniser
 
-import hardwaresimulator.AND_HDL_TOKENS
-import hardwaresimulator.NOT16_HDL_TOKENS
-import hardwaresimulator.NOT_HDL_TOKENS
-import hardwaresimulator.OR_HDL_TOKENS
+import hardwaresimulator.internal.AND_HDL_TOKENS
+import hardwaresimulator.internal.NOT16_HDL_TOKENS
+import hardwaresimulator.internal.NOT_HDL_TOKENS
+import hardwaresimulator.internal.OR_HDL_TOKENS
 import org.junit.Test
 import java.io.File
 import kotlin.test.assertEquals

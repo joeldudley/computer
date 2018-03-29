@@ -1,19 +1,19 @@
-package hardwaresimulator.generator
+package hardwaresimulator.internal.generator
 
-import hardwaresimulator.ChipIOGates
-import hardwaresimulator.NandGate
-import hardwaresimulator.PassthroughGate
-import hardwaresimulator.parser.Node
+import hardwaresimulator.Chip
+import hardwaresimulator.internal.NandGate
+import hardwaresimulator.internal.PassthroughGate
+import hardwaresimulator.internal.parser.Node
 
 // TODO: Correct this. Need to use index, and not just name.
 class Generator {
-    fun generateChip(name: String): ChipIOGates {
+    fun generateChip(name: String): Chip {
         val chipGenerator = chipGenerators[name] ?: throw IllegalArgumentException("Unknown chip.")
         return chipGenerator()
     }
 
     // A function that generates a Nand gate.
-    private val nandGenerator = fun(): ChipIOGates {
+    private val nandGenerator = fun(): Chip {
         val nandGate = NandGate()
 
         val in1 = PassthroughGate()
@@ -24,9 +24,9 @@ class Generator {
         nandGate.in2 = in2
         in2.outputs.add(nandGate)
 
-        return ChipIOGates(
-                inGates = mapOf("a" to in1, "b" to in2),
-                outGates = mapOf("out" to nandGate))
+        return Chip(
+                inputs = mapOf("a" to in1, "b" to in2),
+                outputs = mapOf("out" to nandGate))
     }
 
     // Known chip generators.
@@ -35,7 +35,7 @@ class Generator {
     )
 
     fun addChipDefinition(chip: Node.Chip) {
-        chipGenerators.put(chip.name, fun(): ChipIOGates {
+        chipGenerators.put(chip.name, fun(): Chip {
             // Step 1: Get the names of all the variable names in the inputs,
             // the outputs and the part RHSs.
             val inGateNames = chip.ins.map { it.name }
@@ -81,11 +81,7 @@ class Generator {
                 }
             }
 
-            return ChipIOGates(
-                    // TODO: Clear this up.
-                    inGates.map { it.key to it.value }.toMap(),
-                    outGates.map { it.key to it.value }.toMap()
-            )
+            return Chip(inGates, outGates)
         })
     }
 }

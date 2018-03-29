@@ -1,33 +1,34 @@
-package hardwaresimulator.evaluator
+package hardwaresimulator.internal.evaluator
 
-import hardwaresimulator.ChipIOGates
-import hardwaresimulator.Gate
+import hardwaresimulator.Chip
+import hardwaresimulator.ChipInput
+import hardwaresimulator.internal.Gate
 
 val LOOPS_TO_INITIALISE = 3
 
 class Evaluator {
     // The chip currently being simulated.
-    private var loadedChip: ChipIOGates? = null
+    private var loadedChip: Chip? = null
 
-    fun loadChip(chip: ChipIOGates) {
+    fun loadChip(chip: Chip) {
         loadedChip = chip
         initialiseChip()
     }
 
-    fun setInputs(inputs: List<Pair<String, Boolean>>) {
-        val inputGates = loadedChip?.inGates ?: throw IllegalStateException("No chip loaded in the simulator.")
+    fun setInputs(inputs: List<ChipInput>) {
+        val inputGates = loadedChip?.inputs ?: throw IllegalStateException("No chip loaded in the simulator.")
 
         // For each input gate, if its new value is different to its existing
         // value, we set its value and get its downstream output gates.
-        val outputs = inputs.flatMap { (gateName, newValue) ->
-            val gate = inputGates[gateName] ?: throw IllegalArgumentException("Unknown input gate.")
-            if (gate.value != newValue) {
-                gate.value = newValue
-                gate.outputs
-            } else {
-                listOf<Gate>()
+        val outputs = mutableListOf<Gate>()
+
+        inputs.forEach { input ->
+            val gate = inputGates[input.name] ?: throw IllegalArgumentException("Unknown input gate.")
+            if (gate.value != input.value) {
+                gate.value = input.value
+                outputs.addAll(gate.outputs)
             }
-        }.toMutableList()
+        }
 
         // For each output, if its new value is different to its existing
         // value, we set its value and recursively update its downstream
@@ -45,16 +46,16 @@ class Evaluator {
     }
 
     fun getValue(gateName: String): Boolean {
-        val outputGates = loadedChip?.outGates ?: throw IllegalStateException("No chip loaded in the simulator.")
+        val outputGates = loadedChip?.outputs ?: throw IllegalStateException("No chip loaded in the simulator.")
         val outputGate = outputGates[gateName] ?: throw IllegalArgumentException("Unknown output gate.")
         return outputGate.value
     }
 
     private fun initialiseChip() {
-        val inputGates = loadedChip?.inGates ?: throw IllegalStateException("No chip loaded in the simulator.")
+        val inputGates = loadedChip?.inputs ?: throw IllegalStateException("No chip loaded in the simulator.")
 
-        inputGates.values.forEach {
-            gate -> gate.value = false
+        inputGates.values.forEach { gate ->
+            gate.value = false
         }
 
         repeat(LOOPS_TO_INITIALISE) {

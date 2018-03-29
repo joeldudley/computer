@@ -1,4 +1,4 @@
-package hardwaresimulator.tokeniser
+package hardwaresimulator.internal.tokeniser
 
 /**
  * Parses a string representing a .hdl chip definition into a list of tokens.

@@ -1,7 +1,6 @@
-package hardwaresimulator.generator
+package hardwaresimulator.internal.generator
 
-import org.junit.Test
-import kotlin.test.assertEquals
+import hardwaresimulator.internal.generator.Generator
 
 class GeneratorTests {
     private val generator = Generator()

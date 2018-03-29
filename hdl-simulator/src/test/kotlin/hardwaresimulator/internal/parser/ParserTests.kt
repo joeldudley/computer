@@ -1,6 +1,6 @@
-package hardwaresimulator.parser
+package hardwaresimulator.internal.parser
 
-import hardwaresimulator.*
+import hardwaresimulator.internal.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException

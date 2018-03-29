@@ -1,4 +1,4 @@
-package hardwaresimulator.parser
+package hardwaresimulator.internal.parser
 
 sealed class Node {
     data class Chip(

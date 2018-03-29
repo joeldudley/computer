@@ -1,4 +1,4 @@
-package hardwaresimulator
+package hardwaresimulator.internal
 
 // A logic gate.
 sealed class Gate {
