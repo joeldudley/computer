@@ -1,5 +1,6 @@
 package hardwaresimulator
 
+import hardwaresimulator.evaluator.Evaluator
 import hardwaresimulator.generator.Generator
 import hardwaresimulator.parser.Parser
 import hardwaresimulator.tokeniser.Tokeniser
@@ -16,62 +17,40 @@ data class ChipIOGates(val inGates: Map<String, Gate>, val outGates: Map<String,
  * Can generate a Nand gate, plus any chips described in HDL format in the resources folder.
  */
 class HardwareSimulator(chipDefFolders: List<String>) {
-    // A function that generates a Nand gate.
-    private val nandGenerator = fun(): ChipIOGates {
-        val nandGate = NandGate()
-
-        val in1 = PassthroughGate()
-        nandGate.in1 = in1
-        in1.outputs.add(nandGate)
-
-        val in2 = PassthroughGate()
-        nandGate.in2 = in2
-        in2.outputs.add(nandGate)
-
-        return ChipIOGates(
-                inGates = mapOf("a" to in1, "b" to in2),
-                outGates = mapOf("out" to nandGate))
-    }
-
-    // Known chip generators.
-    private val chipGenerators = mutableMapOf(
-            "Nand" to nandGenerator
-    )
     // The chip currently being simulated.
     private var loadedChip: ChipIOGates? = null
 
     private val tokeniser = Tokeniser()
     private val parser = Parser()
     private val generator = Generator()
+    private val evaluator = Evaluator()
 
     init {
         chipDefFolders.forEach { folder ->
-            File(folder).listFiles().forEach { file ->
-                addChipGenerator(file)
+            val files = File(folder).listFiles()
+            files.forEach { file ->
+                val fileContents = file.readText()
+                val tokens = tokeniser.tokenize(fileContents)
+                val chip = parser.parse(tokens)
+                generator.addChipDefinition(chip)
             }
         }
     }
 
-    private fun addChipGenerator(file: File) {
-        val fileContents = file.readText()
-        val tokens = tokeniser.tokenize(fileContents)
-        val chip = parser.parse(tokens)
-        val chipFun = generator.generateChipFun(chip, chipGenerators)
-        chipGenerators.put(chip.name, chipFun)
-    }
-
     fun loadChip(name: String) {
-        loadedChip = chipGenerators[name]?.invoke() ?: throw IllegalArgumentException("Unknown chip.")
+        loadedChip = generator.generateChip(name)
         initialiseChip()
     }
 
     private fun initialiseChip() {
-        if (loadedChip == null) throw IllegalStateException("No chip loaded in the simulator.")
+        val inputGates = loadedChip?.inGates ?: throw IllegalStateException("No chip loaded in the simulator.")
 
-        loadedChip!!.inGates.values.forEach { gate -> gate.value = false }
+        inputGates.values.forEach {
+            gate -> gate.value = false
+        }
 
         repeat(LOOPS_TO_INITIALISE) {
-            val outputs = loadedChip!!.inGates.values.flatMap { gate -> gate.outputs }.toMutableList()
+            val outputs = inputGates.values.flatMap { gate -> gate.outputs }.toMutableList()
 
             var i = 0
             while (i < outputs.size) {
@@ -89,12 +68,12 @@ class HardwareSimulator(chipDefFolders: List<String>) {
     }
 
     fun setInputs(inputs: List<Pair<String, Boolean>>) {
-        if (loadedChip == null) throw IllegalStateException("No chip loaded in the simulator.")
+        val inputGates = loadedChip?.inGates ?: throw IllegalStateException("No chip loaded in the simulator.")
 
         // For each input gate, if its new value is different to its existing
         // value, we set its value and get its downstream output gates.
         val outputs = inputs.flatMap { (gateName, newValue) ->
-            val gate = loadedChip!!.inGates[gateName] ?: throw IllegalArgumentException("Unknown input gate.")
+            val gate = inputGates[gateName] ?: throw IllegalArgumentException("Unknown input gate.")
             if (gate.value != newValue) {
                 gate.value = newValue
                 gate.outputs
@@ -119,8 +98,8 @@ class HardwareSimulator(chipDefFolders: List<String>) {
     }
 
     fun getValue(gateName: String): Boolean {
-        if (loadedChip == null) throw IllegalStateException("No chip loaded in the simulator.")
-        val outputGate = loadedChip!!.outGates[gateName] ?: throw IllegalArgumentException("Unknown output gate.")
+        val outputGates = loadedChip?.outGates ?: throw IllegalStateException("No chip loaded in the simulator.")
+        val outputGate = outputGates[gateName] ?: throw IllegalArgumentException("Unknown output gate.")
         return outputGate.value
     }
 }

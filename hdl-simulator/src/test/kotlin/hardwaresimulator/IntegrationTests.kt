@@ -120,5 +120,12 @@ class IntegrationTests {
         assertEquals(false, simulator.getValue("out"))
     }
 
-    // TODO: Write integration test of Not16 chip.
+    // TODO: Make this pass.
+    // Test of a gate with wide inputs and outputs.
+    @Test
+    fun not16Test() {
+        simulator.loadChip("Not16")
+
+        // TODO: Write test cases. Need to find a way to pass in wide inputs/outputs.
+    }
 }

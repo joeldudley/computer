@@ -13,10 +13,7 @@ sealed class Gate {
 // value = in1.value
 class PassthroughGate : Gate() {
     override fun calculateNewValue(): Boolean {
-        if (in1 == null) {
-            throw IllegalStateException("One of the passthrough gate's inputs is uninitialised.")
-        }
-        return in1!!.value
+        return in1?.value ?: throw IllegalStateException("One of the passthrough gate's inputs is uninitialised.")
     }
 }
 
@@ -26,9 +23,8 @@ class NandGate : Gate() {
     var in2: Gate? = null
 
     override fun calculateNewValue(): Boolean {
-        if (in1 == null || in2 == null) {
-            throw IllegalStateException("One of the nand gate's inputs is uninitialised.")
-        }
-        return !(in1!!.value && in2!!.value)
+        val in1Value = in1?.value ?: throw IllegalStateException("The nand gate's first input is uninitialised.")
+        val in2Value = in2?.value ?: throw IllegalStateException("The nand gate's second input is uninitialised.")
+        return !(in1Value && in2Value)
     }
 }
