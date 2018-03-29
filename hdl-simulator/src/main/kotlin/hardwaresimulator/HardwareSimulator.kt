@@ -23,7 +23,8 @@ class HardwareSimulator(chipDefinitionFolders: List<String>) {
     init {
         chipDefinitionFolders.forEach { folder ->
             val files = File(folder).listFiles()
-            files.forEach { file ->
+            val hdlFiles = files.filter { file -> file.extension == "hdl" }
+            hdlFiles.forEach { file ->
                 val fileContents = file.readText()
                 val tokens = tokeniser.tokenize(fileContents)
                 val chip = parser.parse(tokens)
