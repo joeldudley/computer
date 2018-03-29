@@ -5,7 +5,7 @@ interface HardwareSimulator {
 
     fun loadChip(name: String)
 
-    fun setInputs(vararg inputs: Pair<String, Boolean>)
+    fun setInputs(vararg inputValues: Pair<String, Boolean>)
 
     fun getValue(gateName: String): Boolean
 }

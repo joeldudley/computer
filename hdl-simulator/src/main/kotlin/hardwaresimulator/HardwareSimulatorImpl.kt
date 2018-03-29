@@ -8,7 +8,7 @@ import hardwaresimulator.internal.tokeniser.Tokeniser
 import java.io.File
 
 // Maps input and output gate names to input and output gates for a chip.
-data class Chip(val inputs: Map<String, Gate>, val outputs: Map<String, Gate>)
+data class Chip(val inputGateMap: Map<String, Gate>, val outputGateMap: Map<String, Gate>)
 data class ChipInput(val name: String, val value: Boolean)
 
 /**
@@ -40,8 +40,8 @@ class HardwareSimulatorImpl: HardwareSimulator {
         evaluator.loadChip(chip)
     }
 
-    override fun setInputs(vararg inputs: Pair<String, Boolean>) {
-        val chipInputs = inputs.map { (name, value) -> ChipInput(name, value) }
+    override fun setInputs(vararg inputValues: Pair<String, Boolean>) {
+        val chipInputs = inputValues.map { (name, value) -> ChipInput(name, value) }
         evaluator.setInputs(chipInputs)
     }
 

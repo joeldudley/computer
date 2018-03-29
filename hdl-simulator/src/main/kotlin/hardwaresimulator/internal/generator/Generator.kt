@@ -12,8 +12,8 @@ class Generator {
         return chipGenerator()
     }
 
-    // A function that generates a Nand gate.
-    private val nandGenerator = fun(): Chip {
+    // Known chip generators. Defaults to only Nand.
+    private val chipGenerators = mutableMapOf("Nand" to fun(): Chip {
         val nandGate = NandGate()
 
         val in1 = PassthroughGate()
@@ -24,15 +24,8 @@ class Generator {
         nandGate.in2 = in2
         in2.outputs.add(nandGate)
 
-        return Chip(
-                inputs = mapOf("a" to in1, "b" to in2),
-                outputs = mapOf("out" to nandGate))
-    }
-
-    // Known chip generators.
-    private val chipGenerators = mutableMapOf(
-            "Nand" to nandGenerator
-    )
+        return Chip(mapOf("a" to in1, "b" to in2), mapOf("out" to nandGate))
+    })
 
     fun addChipDefinition(chip: Node.Chip) {
         chipGenerators.put(chip.name, fun(): Chip {
