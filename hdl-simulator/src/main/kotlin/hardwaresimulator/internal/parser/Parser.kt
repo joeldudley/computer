@@ -2,6 +2,10 @@ package hardwaresimulator.internal.parser
 
 import hardwaresimulator.internal.*
 
+// TODO: Remove this crutch later.
+// TODO: Some kind of topological sort to ensure this is populated in the right order (e.g. AND before OR).
+val PART_MAP = mutableMapOf<String, ChipNode>("Nand" to NandNode)
+
 /**
  * Parses a list of tokens into a [Node.Chip].
  */
@@ -17,7 +21,11 @@ internal class Parser {
     fun parse(tokens: List<String>): ChipNode {
         pos = 0
         this.tokens = tokens
-        return ChipNode(parseChipName(), parseInputs(), parseOutputs(), parseParts())
+        val chipName = parseChipName()
+        val chipNode = RegularChipNode(chipName, parseInputs(), parseOutputs(), parseParts())
+        // TODO: This is probably bad. Redesign.
+        PART_MAP.put(chipName, chipNode)
+        return chipNode
     }
 
     /**
@@ -123,7 +131,9 @@ internal class Parser {
      */
     private fun parsePart(): PartNode {
         val partName = tokens[pos]
+        val part = PART_MAP[partName]!!
         pos++
+
         if (tokens[pos] != "(") throw IllegalArgumentException("Expected token (, got token ${tokens[pos]}.")
         pos++
 
@@ -163,6 +173,6 @@ internal class Parser {
         if (tokens[pos] != ";") throw IllegalArgumentException("Missing semi-colon after part name.")
         pos++
 
-        return PartNode(partName, assignments)
+        return PartNode(part, assignments)
     }
 }

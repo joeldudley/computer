@@ -22,6 +22,8 @@ class ParserTests {
     // Test of a small gate (2/3).
     @Test
     fun andTest() {
+        // TODO: Required for now to force loading of NOT tree into PARSE_MAP.
+        parser.parse(NOT_HDL_TOKENS)
         val tree = parser.parse(AND_HDL_TOKENS)
         assertEquals(AND_CHIP, tree)
     }
@@ -29,6 +31,9 @@ class ParserTests {
     // Test of a small gate (3/3).
     @Test
     fun orTest() {
+        // TODO: Required for now to force loading of NOT and AND trees into PARSE_MAP.
+        parser.parse(NOT_HDL_TOKENS)
+        parser.parse(AND_HDL_TOKENS)
         val tree = parser.parse(OR_HDL_TOKENS)
         assertEquals(OR_CHIP, tree)
     }
@@ -37,6 +42,8 @@ class ParserTests {
     // parts.
     @Test
     fun not16Test() {
+        // TODO: Required for now to force loading of NOT tree into PARSE_MAP.
+        parser.parse(NOT_HDL_TOKENS)
         val tree = parser.parse(NOT16_HDL_TOKENS)
         assertEquals(NOT16_CHIP, tree)
     }
