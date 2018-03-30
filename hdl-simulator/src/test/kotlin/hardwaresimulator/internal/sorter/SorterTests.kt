@@ -1,12 +1,20 @@
 package hardwaresimulator.internal.sorter
 
 import hardwaresimulator.internal.tokeniser.Tokenizer
+import org.junit.Before
 import org.junit.Test
 import java.io.File
 import kotlin.test.assertEquals
 
 class SorterTests {
-    val sorter = Sorter()
+    private lateinit var sorter: Sorter
+
+    @Before
+    fun before() {
+        sorter = Sorter()
+    }
+
+    // TODO: Add more HDL definitions and add a more granular test.
 
     @Test
     fun extractPartNamesTest() {
@@ -17,7 +25,7 @@ class SorterTests {
         val hdlFilesText = hdlFiles.map { it.readText() }
         val tokensList = hdlFilesText.map { tokeniser.tokenize(it) }
 
-        val sortedElements = sorter.sortHDLFilesTopologically(tokensList)
+        val sortedElements = sorter.orderChipDefinitions(tokensList)
         assertEquals(sortedElements[0].name, "Not")
         assertEquals(sortedElements[1].name, "Or")
         assertEquals(sortedElements[2].name, "Not16")

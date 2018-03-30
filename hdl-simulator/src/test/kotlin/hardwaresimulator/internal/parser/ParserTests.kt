@@ -1,13 +1,19 @@
 package hardwaresimulator.internal.parser
 
 import hardwaresimulator.internal.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
 import kotlin.test.assertEquals
 
 class ParserTests {
-    private val parser = Parser()
+    private lateinit var parser: Parser
+
+    @Before
+    fun before() {
+        parser = Parser()
+    }
 
     @get:Rule
     val exception = ExpectedException.none()
@@ -22,6 +28,7 @@ class ParserTests {
     // Test of a small gate (2/3).
     @Test
     fun andTest() {
+        parser.parseAndCacheLibraryPart(NOT_HDL_TOKENS)
         val tree = parser.parse(AND_HDL_TOKENS)
         assertEquals(AND_CHIP, tree)
     }
@@ -29,9 +36,8 @@ class ParserTests {
     // Test of a small gate (3/3).
     @Test
     fun orTest() {
-        // TODO: Required for now to force loading of NOT and AND trees into PARSE_MAP.
-        parser.parse(NOT_HDL_TOKENS)
-        parser.parse(AND_HDL_TOKENS)
+        parser.parseAndCacheLibraryPart(NOT_HDL_TOKENS)
+        parser.parseAndCacheLibraryPart(AND_HDL_TOKENS)
         val tree = parser.parse(OR_HDL_TOKENS)
         assertEquals(OR_CHIP, tree)
     }
@@ -40,8 +46,7 @@ class ParserTests {
     // parts.
     @Test
     fun not16Test() {
-        // TODO: Required for now to force loading of NOT tree into PARSE_MAP.
-        parser.parse(NOT_HDL_TOKENS)
+        parser.parseAndCacheLibraryPart(NOT_HDL_TOKENS)
         val tree = parser.parse(NOT16_HDL_TOKENS)
         assertEquals(NOT16_CHIP, tree)
     }

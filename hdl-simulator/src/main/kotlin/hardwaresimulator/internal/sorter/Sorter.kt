@@ -4,7 +4,7 @@ class ChipNameAndParts(val name: String, val dependencies: MutableSet<String>)
 class SortNode(val name: String, val inEdges: MutableSet<SortNode>, val outEdges: MutableSet<SortNode>)
 
 class Sorter {
-    fun sortHDLFilesTopologically(tokensList: List<List<String>>): MutableList<SortNode> {
+    fun orderChipDefinitions(tokensList: List<List<String>>): MutableList<SortNode> {
         val chipNamesAndParts = tokensList.map { tokens -> extractChipNameAndParts(tokens) }
 
         val sortNodes = createDependencyGraph(chipNamesAndParts)

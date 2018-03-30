@@ -19,8 +19,13 @@ internal class Parser {
         pos = 0
         this.tokens = tokens
         val chipNode = RegularChipNode(parseChipName(), parseInputs(), parseOutputs(), parseParts())
-        parsedChips.put(chipNode.name, chipNode)
         return chipNode
+    }
+
+    fun parseAndCacheLibraryPart(tokens: List<String>) {
+        val chipNode = parse(tokens)
+        // TODO: Stop this cast. And what happens if it is a Nand?
+        parsedChips.put((chipNode as RegularChipNode).name, chipNode)
     }
 
     /**

@@ -4,18 +4,24 @@ import hardwaresimulator.internal.AND_HDL_TOKENS
 import hardwaresimulator.internal.NOT16_HDL_TOKENS
 import hardwaresimulator.internal.NOT_HDL_TOKENS
 import hardwaresimulator.internal.OR_HDL_TOKENS
+import org.junit.Before
 import org.junit.Test
 import java.io.File
 import kotlin.test.assertEquals
 
 class TokeniserTests {
-    private val tokeniser = Tokenizer()
+    private lateinit var tokenizer: Tokenizer
+
+    @Before
+    fun before() {
+        tokenizer = Tokenizer()
+    }
 
     // Test of a small gate (1/3).
     @Test
     fun notTest() {
         val input = File("src/test/resources/Not.hdl").readText()
-        val tokens = tokeniser.tokenize(input)
+        val tokens = tokenizer.tokenize(input)
         assertEquals(NOT_HDL_TOKENS, tokens)
     }
 
@@ -23,7 +29,7 @@ class TokeniserTests {
     @Test
     fun andTest() {
         val input = File("src/test/resources/And.hdl").readText()
-        val tokens = tokeniser.tokenize(input)
+        val tokens = tokenizer.tokenize(input)
         assertEquals(AND_HDL_TOKENS, tokens)
     }
 
@@ -31,7 +37,7 @@ class TokeniserTests {
     @Test
     fun orTest() {
         val input = File("src/test/resources/Or.hdl").readText()
-        val tokens = tokeniser.tokenize(input)
+        val tokens = tokenizer.tokenize(input)
         assertEquals(OR_HDL_TOKENS, tokens)
     }
 
@@ -39,7 +45,7 @@ class TokeniserTests {
     @Test
     fun not16Test() {
         val input = File("src/test/resources/Not16.hdl").readText()
-        val tokens = tokeniser.tokenize(input)
+        val tokens = tokenizer.tokenize(input)
         assertEquals(NOT16_HDL_TOKENS, tokens)
     }
 
