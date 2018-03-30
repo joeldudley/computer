@@ -2,13 +2,11 @@ package hardwaresimulator.internal
 
 sealed class Node
 
-open class ChipNode : Node()
-object NandNode : ChipNode()
-data class RegularChipNode(
+data class ChipNode(
         val name: String,
         val inputs: List<IOPinNode>,
         val outputs: List<IOPinNode>,
-        val parts: List<PartNode>) : ChipNode()
+        val parts: List<PartNode>) : Node()
 
 data class IOPinNode(val name: String, val width: Int) : Node()
 data class InternalPinNode(val name: String, val index: Int) : Node()

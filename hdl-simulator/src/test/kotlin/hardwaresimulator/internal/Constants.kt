@@ -31,6 +31,7 @@ val NO_OUTPUTS_TOKENS = listOf("CHIP", "Not", "{", "IN", "in", ";", "OUT", ";", 
 val NO_PARTS_TOKENS = listOf("CHIP", "Not", "{", "IN", "in", ";", "OUT", "out", ";", "PARTS:", "}")
 
 val NOT_CHIP = {
+    val nandNode = ChipNode("Nand", listOf(), listOf(), listOf())
     val nandAssignments = listOf(
             AssignmentNode(
                     InternalPinNode("a", 0),
@@ -45,17 +46,18 @@ val NOT_CHIP = {
                     InternalPinNode("out", 0)
             )
     )
-    val nandPartNode = PartNode(NandNode, nandAssignments)
+    val nandPartNode = PartNode(nandNode, nandAssignments)
 
     val notIns = listOf(IOPinNode("in", 1))
     val notOuts = listOf(IOPinNode("out", 1))
     val notParts = listOf(nandPartNode)
-    val notNode = RegularChipNode("Not", notIns, notOuts, notParts)
+    val notNode = ChipNode("Not", notIns, notOuts, notParts)
 
     notNode
 }()
 
 val AND_CHIP = {
+    val nandNode = ChipNode("Nand", listOf(), listOf(), listOf())
     val nandAssignments = listOf(
             AssignmentNode(
                     InternalPinNode("a", 0),
@@ -70,7 +72,7 @@ val AND_CHIP = {
                     InternalPinNode("nandOut", 0)
             )
     )
-    val nandPartNode = PartNode(NandNode, nandAssignments)
+    val nandPartNode = PartNode(nandNode, nandAssignments)
 
     val notAssignments = listOf(
             AssignmentNode(
@@ -92,7 +94,7 @@ val AND_CHIP = {
             IOPinNode("out", 1)
     )
     val andParts = listOf(nandPartNode, notPartNode)
-    val andNode = RegularChipNode("And", andIns, andOuts, andParts)
+    val andNode = ChipNode("And", andIns, andOuts, andParts)
 
     andNode
 }()
@@ -122,6 +124,7 @@ val OR_CHIP = {
     )
     val not2PartNode = PartNode(NOT_CHIP, not2Assignments)
 
+    val nandNode = ChipNode("Nand", listOf(), listOf(), listOf())
     val nandAssignments = listOf(
             AssignmentNode(
                     InternalPinNode("a", 0),
@@ -136,7 +139,7 @@ val OR_CHIP = {
                     InternalPinNode("out", 0)
             )
     )
-    val nandPartNode = PartNode(NandNode, nandAssignments)
+    val nandPartNode = PartNode(nandNode, nandAssignments)
 
     val orIns = listOf(
             IOPinNode("a", 1),
@@ -146,7 +149,7 @@ val OR_CHIP = {
             IOPinNode("out", 1)
     )
     val orParts = listOf(not1PartNode, not2PartNode, nandPartNode)
-    val orNode = RegularChipNode("Or", orIns, orOuts, orParts)
+    val orNode = ChipNode("Or", orIns, orOuts, orParts)
 
     orNode
 }()
@@ -170,7 +173,7 @@ val NOT16_CHIP = {
                 ))
         PartNode(NOT_CHIP, notAssignments)
     }
-    val not16Node = RegularChipNode("Not16", not16Ins, not16Outs, not16Parts)
+    val not16Node = ChipNode("Not16", not16Ins, not16Outs, not16Parts)
 
     not16Node
 }()

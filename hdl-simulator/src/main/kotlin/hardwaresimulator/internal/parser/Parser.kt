@@ -6,7 +6,7 @@ import hardwaresimulator.internal.*
  * Parses a list of tokens into a [Node.Chip].
  */
 internal class Parser {
-    private val parsedChips = mutableMapOf<String, ChipNode>("Nand" to NandNode)
+    private val parsedChips = mutableMapOf("Nand" to ChipNode("Nand", listOf(), listOf(), listOf()))
     // The current position in the list of tokens.
     private var pos = 0
     // The list of tokens to parse.
@@ -18,14 +18,13 @@ internal class Parser {
     fun parse(tokens: List<String>): ChipNode {
         pos = 0
         this.tokens = tokens
-        val chipNode = RegularChipNode(parseChipName(), parseInputs(), parseOutputs(), parseParts())
+        val chipNode = ChipNode(parseChipName(), parseInputs(), parseOutputs(), parseParts())
         return chipNode
     }
 
     fun parseAndCacheLibraryPart(tokens: List<String>) {
         val chipNode = parse(tokens)
-        // TODO: Stop this cast. And what happens if it is a Nand?
-        parsedChips.put((chipNode as RegularChipNode).name, chipNode)
+        parsedChips.put(chipNode.name, chipNode)
     }
 
     /**

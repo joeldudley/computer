@@ -4,7 +4,7 @@ class ChipNameAndParts(val name: String, val dependencies: MutableSet<String>)
 class SortNode(val name: String, val inEdges: MutableSet<SortNode>, val outEdges: MutableSet<SortNode>)
 
 class Sorter {
-    fun orderChipDefinitions(tokensList: List<List<String>>): MutableList<SortNode> {
+    fun orderChipDefinitions(tokensList: List<List<String>>): List<String> {
         val chipNamesAndParts = tokensList.map { tokens -> extractChipNameAndParts(tokens) }
 
         val sortNodes = createDependencyGraph(chipNamesAndParts)
@@ -25,7 +25,7 @@ class Sorter {
             }
         }
 
-        return sortedElements
+        return sortedElements.map { sortNode -> sortNode.name }
     }
 
     fun createDependencyGraph(chipNamesAndParts: List<ChipNameAndParts>): List<SortNode> {
