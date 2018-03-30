@@ -9,7 +9,7 @@ import java.io.File
 import kotlin.test.assertEquals
 
 class TokeniserTests {
-    private val tokeniser = Tokeniser()
+    private val tokeniser = Tokenizer()
 
     // Test of a small gate (1/3).
     @Test
