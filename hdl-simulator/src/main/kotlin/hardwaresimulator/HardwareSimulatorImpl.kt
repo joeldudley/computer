@@ -10,7 +10,6 @@ import java.io.File
 
 // Maps input and output gate names to input and output gates for a chip.
 data class Chip(val inputGateMap: Map<String, Gate>, val outputGateMap: Map<String, Gate>)
-
 data class ChipInput(val name: String, val value: Boolean)
 
 /**
@@ -26,15 +25,11 @@ class HardwareSimulatorImpl : HardwareSimulator {
     private val evaluator = Evaluator()
 
     override fun loadLibraryChips(vararg paths: String) {
-        // TODO: We assume here the paths are folders. What if they're files? Handle that.
-        val files = paths.flatMap { folder -> File(folder).listFiles().toList() }
+        val files = pathsToFiles(paths.toList())
         val hdlFiles = files.filter { file -> file.extension == "hdl" }
-        val hdlFileTexts = hdlFiles.map { file -> file.readText() }
-        val hdlTokens = hdlFileTexts.map { text -> tokenizer.tokenize(text) }
+        val hdlTokens = hdlFiles.map { file -> tokenizer.tokenize(file.readText()) }
         val sortedHdlTokens = sorter.orderChipDefinitions(hdlTokens)
-        for (tokens in sortedHdlTokens) {
-            parser.parseAndCacheLibraryPart(tokens)
-        }
+        sortedHdlTokens.forEach { tokens -> parser.parseAndCacheLibraryPart(tokens) }
     }
 
     override fun loadChip(path: String) {
@@ -42,8 +37,7 @@ class HardwareSimulatorImpl : HardwareSimulator {
         if (file.extension != "hdl") {
             throw IllegalArgumentException("Wrong file extension. Expected .hdl but got .${file.extension}.")
         }
-        val text = file.readText()
-        val tokens = tokenizer.tokenize(text)
+        val tokens = tokenizer.tokenize(file.readText())
         val node = parser.parse(tokens)
         val chip = generator.generateChip(node)
         evaluator.loadChip(chip)
@@ -56,5 +50,16 @@ class HardwareSimulatorImpl : HardwareSimulator {
 
     override fun getValue(gateName: String): Boolean {
         return evaluator.getValue(gateName)
+    }
+
+    private fun pathsToFiles(paths: List<String>): List<File> {
+        return paths.flatMap { path ->
+            val fileOrDirectory = File(path)
+            if (fileOrDirectory.isDirectory) {
+                fileOrDirectory.listFiles().toList()
+            } else {
+                listOf(fileOrDirectory)
+            }
+        }
     }
 }
