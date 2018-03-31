@@ -1,9 +1,9 @@
 package hardwaresimulator.internal.sorter
 
-data class ChipNameAndParts(val name: String, val parts: MutableSet<String>)
-class ChipDependencyNode(val name: String, val inEdges: MutableSet<ChipDependencyNode>, val outEdges: MutableSet<ChipDependencyNode>)
-
 class Sorter {
+    private class ChipNameAndParts(val name: String, val parts: MutableSet<String>)
+    private class DependencyNode(val name: String, val inEdges: MutableSet<DependencyNode>, val outEdges: MutableSet<DependencyNode>)
+
     fun orderChipDefinitions(tokensList: List<List<String>>): List<List<String>> {
         val chipNamesAndParts = tokensList.map { tokens -> extractChipNameAndParts(tokens) }
         val chipNames = chipNamesAndParts.map { it.name }
@@ -37,25 +37,24 @@ class Sorter {
         }
     }
 
-    // TODO: Rename sortNodeMap references.
-    private fun createDependencyGraph(chipNamesAndParts: List<ChipNameAndParts>): List<ChipDependencyNode> {
-        val sortNodeMap = mutableMapOf<String, ChipDependencyNode>()
-        chipNamesAndParts.forEach { sortNodeMap.put(it.name, ChipDependencyNode(it.name, mutableSetOf(), mutableSetOf())) }
-        for ((name, parts) in chipNamesAndParts) {
-            val sortNode = sortNodeMap[name]!!
-            for (part in parts) {
+    private fun createDependencyGraph(chipNamesAndParts: List<ChipNameAndParts>): List<DependencyNode> {
+        val dependencyNodeMap = chipNamesAndParts.map { it.name to DependencyNode(it.name, mutableSetOf(), mutableSetOf()) }.toMap()
+        for (chipNameAndPart in chipNamesAndParts) {
+            val dependencyNode = dependencyNodeMap[chipNameAndPart.name]!!
+            for (part in chipNameAndPart.parts) {
                 // TODO: Don't hardcode this.
                 if (part != "Nand") {
-                    sortNodeMap[part]!!.outEdges.add(sortNode)
-                    sortNode.inEdges.add(sortNodeMap[part]!!)
+                    val partNode = dependencyNodeMap[part]!!
+                    partNode.outEdges.add(dependencyNode)
+                    dependencyNode.inEdges.add(partNode)
                 }
             }
         }
-        return sortNodeMap.values.toList()
+        return dependencyNodeMap.values.toList()
     }
 
-    private fun topologicalSort(chipDependencyNodes: List<ChipDependencyNode>): List<String> {
-        val sortedElements = mutableListOf<ChipDependencyNode>()
+    private fun topologicalSort(chipDependencyNodes: List<DependencyNode>): List<String> {
+        val sortedElements = mutableListOf<DependencyNode>()
         val nodesWithNoEdges = chipDependencyNodes.filter { it.inEdges.isEmpty() }.toMutableSet()
 
         while (nodesWithNoEdges.isNotEmpty()) {

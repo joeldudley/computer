@@ -25,8 +25,9 @@ class HardwareSimulatorImpl : HardwareSimulator {
     private val generator = Generator()
     private val evaluator = Evaluator()
 
-    override fun loadChipDefinitions(vararg chipDefinitionFolders: String) {
-        val files = chipDefinitionFolders.flatMap { folder -> File(folder).listFiles().toList() }
+    override fun loadLibraryChips(vararg paths: String) {
+        // TODO: We assume here the paths are folders. What if they're files? Handle that.
+        val files = paths.flatMap { folder -> File(folder).listFiles().toList() }
         val hdlFiles = files.filter { file -> file.extension == "hdl" }
         val hdlFileTexts = hdlFiles.map { file -> file.readText() }
         val hdlTokens = hdlFileTexts.map { text -> tokenizer.tokenize(text) }
@@ -36,8 +37,12 @@ class HardwareSimulatorImpl : HardwareSimulator {
         }
     }
 
-    override fun loadChip(name: String) {
-        val chip = generator.generateChip(name)
+    override fun loadChip(path: String) {
+        val file = File(path)
+        val text = file.readText()
+        val tokens = tokenizer.tokenize(text)
+        val node = parser.parse(tokens)
+        val chip = generator.generateChip(node)
         evaluator.loadChip(chip)
     }
 

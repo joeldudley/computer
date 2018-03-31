@@ -1,36 +1,21 @@
 package hardwaresimulator.internal.generator
 
 import hardwaresimulator.Chip
-import hardwaresimulator.internal.Gate
-import hardwaresimulator.internal.NandGate
-import hardwaresimulator.internal.PassthroughGate
-import hardwaresimulator.internal.ChipNode
-import hardwaresimulator.internal.PartNode
+import hardwaresimulator.internal.*
 
-// TODO: Correct this. Need to use index, and not just name.
+// TODO: Correct this. Need to use handle indexes in square brackets.
 class Generator {
-    fun generateChip(name: String): Chip {
-        val chipGenerator = chipGenerators[name] ?: throw IllegalArgumentException("Unknown chip.")
-        return chipGenerator()
-    }
-
-    fun addChipGenerator(chipNode: ChipNode) {
+    fun generateChip(chipNode: ChipNode): Chip {
         // Stage 1: Create a list of variables used in the chip definition,
         // including inputs and outputs.
         val chipVariableNames = getChipNodeVariableNames(chipNode)
 
-        // Step 2: Create a new chip generator.
-        fun chipGenerator(): Chip {
-            // Step 2.1: Map each variable name to a gate.
-            val chipGates = createChipGates(chipVariableNames)
-            // Step 2.2: Create and hook up the chip's parts.
-            generateAndHookUpChipParts(chipNode, chipGates.allGates)
-            // Step 2.3: Create and return chip.
-            return Chip(chipGates.inputGates, chipGates.outputGates)
-        }
-
-        // Step 3: Add the new chip generator to the map of chip generators.
-        chipGenerators.put(chipNode.name, ::chipGenerator)
+        // Step 2.1: Map each variable name to a gate.
+        val chipGates = createChipGates(chipVariableNames)
+        // Step 2.2: Create and hook up the chip's parts.
+        generateAndHookUpChipParts(chipNode, chipGates.allGates)
+        // Step 2.3: Create and return chip.
+        return Chip(chipGates.inputGates, chipGates.outputGates)
     }
 
     private class ChipVariableNames(
@@ -45,7 +30,7 @@ class Generator {
         val allGates = inputGates + outputGates + uniqueInternalVariableGates
     }
 
-    private fun nandChipGenerator(): Chip {
+    private fun generateNand(): Chip {
         val nandGate = NandGate()
 
         val in1 = PassthroughGate()
@@ -60,9 +45,6 @@ class Generator {
         val outputGateMap = mapOf("out" to nandGate)
         return Chip(inputGateMap, outputGateMap)
     }
-
-    // Known chip generators. Initially, only NAND, the built-in chip, is known.
-    private val chipGenerators = mutableMapOf("Nand" to ::nandChipGenerator)
 
     private fun getChipNodeVariableNames(chipNode: ChipNode): ChipVariableNames {
         val inputNames = chipNode.inputs.map { it.name }
@@ -96,8 +78,11 @@ class Generator {
 
     private fun generateAndHookUpPart(partNode: PartNode, allGates: Map<String, Gate>) {
         // Step 1.2.1: Create chips for each part.
-        val partGenerator = chipGenerators[partNode.chip.name] ?: throw IllegalArgumentException("Unsupported chip.")
-        val partChip = partGenerator()
+        val partChip = if (partNode.chip.name == "Nand") {
+            generateNand()
+        } else {
+            generateChip(partNode.chip)
+        }
 
         // Step 1.2.2: Hook up all the gates.
         partNode.assignments.forEach { assignment ->
