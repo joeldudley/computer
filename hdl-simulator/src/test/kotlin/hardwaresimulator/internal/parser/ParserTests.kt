@@ -12,7 +12,7 @@ class ParserTests {
 
     @Before
     fun before() {
-        parser = Parser()
+        parser = ParserImpl()
     }
 
     @get:Rule

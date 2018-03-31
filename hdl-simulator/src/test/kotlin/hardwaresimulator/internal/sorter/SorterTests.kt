@@ -13,13 +13,13 @@ class SorterTests {
 
     @Before
     fun before() {
-        sorter = Sorter()
+        sorter = SorterImpl()
     }
 
     @Test
     fun extractPartNamesTest() {
         val tokensList = listOf(AND_HDL_TOKENS, NOT_HDL_TOKENS, NOT16_HDL_TOKENS, OR_HDL_TOKENS)
-        val sortedElements = sorter.orderChipDefinitions(tokensList)
+        val sortedElements = sorter.topologicallySortChipDefinitions(tokensList)
 
         assertEquals(sortedElements[0], NOT_HDL_TOKENS)
         assertEquals(sortedElements[1], OR_HDL_TOKENS)

@@ -10,11 +10,11 @@ import java.io.File
 import kotlin.test.assertEquals
 
 class TokeniserTests {
-    private lateinit var tokenizer: Tokenizer
+    private lateinit var tokenizer: TokenizerImpl
 
     @Before
     fun before() {
-        tokenizer = Tokenizer()
+        tokenizer = TokenizerImpl()
     }
 
     // Test of a small gate (1/3).
