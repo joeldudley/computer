@@ -6,7 +6,7 @@ import hardwaresimulator.internal.*
  * Parses a list of tokens into a [Node.Chip].
  */
 internal class ParserImpl: Parser {
-    private val parsedChips = mutableMapOf("Nand" to ChipNode("Nand", listOf(), listOf(), listOf()))
+    private val cachedChips = mutableMapOf("Nand" to ChipNode("Nand", listOf(), listOf(), listOf()))
     // The current position in the list of tokens.
     private var pos = 0
     // The list of tokens to parse.
@@ -18,13 +18,14 @@ internal class ParserImpl: Parser {
     override fun parse(tokens: List<String>): ChipNode {
         pos = 0
         this.tokens = tokens
-        val chipNode = ChipNode(parseChipName(), parseInputs(), parseOutputs(), parseParts())
-        return chipNode
-    }
-
-    override fun parseAndCacheLibraryPart(tokens: List<String>) {
-        val chipNode = parse(tokens)
-        parsedChips.put(chipNode.name, chipNode)
+        val chipName = parseChipName()
+        return if (chipName in cachedChips) {
+            cachedChips[chipName]!!
+        } else {
+            val chipNode = ChipNode(chipName, parseInputs(), parseOutputs(), parseParts())
+            cachedChips.put(chipNode.name, chipNode)
+            chipNode
+        }
     }
 
     /**
@@ -130,7 +131,7 @@ internal class ParserImpl: Parser {
      */
     private fun parsePart(): PartNode {
         val partName = tokens[pos]
-        val part = parsedChips[partName]!!
+        val part = cachedChips[partName]!!
         pos++
 
         if (tokens[pos] != "(") throw IllegalArgumentException("Expected token (, got token ${tokens[pos]}.")

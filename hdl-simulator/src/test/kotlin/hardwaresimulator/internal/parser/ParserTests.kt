@@ -28,7 +28,7 @@ class ParserTests {
     // Test of a small gate (2/3).
     @Test
     fun andTest() {
-        parser.parseAndCacheLibraryPart(NOT_HDL_TOKENS)
+        parser.parse(NOT_HDL_TOKENS)
         val tree = parser.parse(AND_HDL_TOKENS)
         assertEquals(AND_CHIP, tree)
     }
@@ -36,8 +36,8 @@ class ParserTests {
     // Test of a small gate (3/3).
     @Test
     fun orTest() {
-        parser.parseAndCacheLibraryPart(NOT_HDL_TOKENS)
-        parser.parseAndCacheLibraryPart(AND_HDL_TOKENS)
+        parser.parse(NOT_HDL_TOKENS)
+        parser.parse(AND_HDL_TOKENS)
         val tree = parser.parse(OR_HDL_TOKENS)
         assertEquals(OR_CHIP, tree)
     }
@@ -46,7 +46,7 @@ class ParserTests {
     // parts.
     @Test
     fun not16Test() {
-        parser.parseAndCacheLibraryPart(NOT_HDL_TOKENS)
+        parser.parse(NOT_HDL_TOKENS)
         val tree = parser.parse(NOT16_HDL_TOKENS)
         assertEquals(NOT16_CHIP, tree)
     }

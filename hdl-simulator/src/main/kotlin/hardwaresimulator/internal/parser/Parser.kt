@@ -1,16 +1,13 @@
 package hardwaresimulator.internal.parser
 
 import hardwaresimulator.internal.ChipNode
-import hardwaresimulator.internal.Node
 
 /**
- * Parses a list of tokens into a [Node.Chip].
+ * Parses a list of tokens into a [ChipNode].
  */
 interface Parser {
     /**
-     * Parses the [tokens] into a [Node.Chip].
+     * Parses the [tokens] and caches the resulting [ChipNode].
      */
     fun parse(tokens: List<String>): ChipNode
-
-    fun parseAndCacheLibraryPart(tokens: List<String>)
 }

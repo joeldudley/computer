@@ -7,5 +7,5 @@ interface HardwareSimulator {
 
     fun setInputs(vararg inputValues: Pair<String, Boolean>)
 
-    fun getValue(gateName: String): Boolean
+    fun getOutput(gateName: String): Boolean
 }

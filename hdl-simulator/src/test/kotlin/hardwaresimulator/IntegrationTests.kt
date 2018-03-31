@@ -15,16 +15,16 @@ class IntegrationTests {
         simulator.loadChip("src/test/resources/Not.hdl")
 
         simulator.setInputs("in" to false)
-        assertEquals(true, simulator.getValue("out"))
+        assertEquals(true, simulator.getOutput("out"))
 
         simulator.setInputs("in" to true)
-        assertEquals(false, simulator.getValue("out"))
+        assertEquals(false, simulator.getOutput("out"))
 
         simulator.setInputs("in" to false)
-        assertEquals(true, simulator.getValue("out"))
+        assertEquals(true, simulator.getOutput("out"))
 
         simulator.setInputs("in" to true)
-        assertEquals(false, simulator.getValue("out"))
+        assertEquals(false, simulator.getOutput("out"))
     }
 
     // Test of a small, non-recursive gate (2/3).
@@ -33,16 +33,16 @@ class IntegrationTests {
         simulator.loadChip("src/test/resources/And.hdl")
 
         simulator.setInputs("a" to false, "b" to false)
-        assertEquals(false, simulator.getValue("out"))
+        assertEquals(false, simulator.getOutput("out"))
 
         simulator.setInputs("a" to false, "b" to true)
-        assertEquals(false, simulator.getValue("out"))
+        assertEquals(false, simulator.getOutput("out"))
 
         simulator.setInputs("a" to true, "b" to false)
-        assertEquals(false, simulator.getValue("out"))
+        assertEquals(false, simulator.getOutput("out"))
 
         simulator.setInputs("a" to true, "b" to true)
-        assertEquals(true, simulator.getValue("out"))
+        assertEquals(true, simulator.getOutput("out"))
     }
 
     // Test of a small, non-recursive gate (3/3).
@@ -51,16 +51,16 @@ class IntegrationTests {
         simulator.loadChip("src/test/resources/Or.hdl")
 
         simulator.setInputs("a" to false, "b" to false)
-        assertEquals(false, simulator.getValue("out"))
+        assertEquals(false, simulator.getOutput("out"))
 
         simulator.setInputs("a" to false, "b" to true)
-        assertEquals(true, simulator.getValue("out"))
+        assertEquals(true, simulator.getOutput("out"))
 
         simulator.setInputs("a" to true, "b" to false)
-        assertEquals(true, simulator.getValue("out"))
+        assertEquals(true, simulator.getOutput("out"))
 
         simulator.setInputs("a" to true, "b" to true)
-        assertEquals(true, simulator.getValue("out"))
+        assertEquals(true, simulator.getOutput("out"))
     }
 
     // Test of the 3-way nand gate.
@@ -70,28 +70,28 @@ class IntegrationTests {
         simulator.loadChip("src/test/resources/Nand3Way.hdl")
 
         simulator.setInputs("a" to false, "b" to false, "c" to false)
-        assertEquals(true, simulator.getValue("out"))
+        assertEquals(true, simulator.getOutput("out"))
 
         simulator.setInputs("a" to false, "b" to false, "c" to true)
-        assertEquals(true, simulator.getValue("out"))
+        assertEquals(true, simulator.getOutput("out"))
 
         simulator.setInputs("a" to false, "b" to true, "c" to false)
-        assertEquals(true, simulator.getValue("out"))
+        assertEquals(true, simulator.getOutput("out"))
 
         simulator.setInputs("a" to false, "b" to true, "c" to true)
-        assertEquals(true, simulator.getValue("out"))
+        assertEquals(true, simulator.getOutput("out"))
 
         simulator.setInputs("a" to true, "b" to false, "c" to false)
-        assertEquals(true, simulator.getValue("out"))
+        assertEquals(true, simulator.getOutput("out"))
 
         simulator.setInputs("a" to true, "b" to false, "c" to true)
-        assertEquals(true, simulator.getValue("out"))
+        assertEquals(true, simulator.getOutput("out"))
 
         simulator.setInputs("a" to true, "b" to true, "c" to false)
-        assertEquals(true, simulator.getValue("out"))
+        assertEquals(true, simulator.getOutput("out"))
 
         simulator.setInputs("a" to true, "b" to true, "c" to true)
-        assertEquals(false, simulator.getValue("out"))
+        assertEquals(false, simulator.getOutput("out"))
     }
 
     // Test of a small recursive gate.
@@ -100,27 +100,27 @@ class IntegrationTests {
         simulator.loadChip("src/test/resources/DFF.hdl")
 
         simulator.setInputs("data" to false, "clock" to false)
-        assertEquals(false, simulator.getValue("out"))
+        assertEquals(false, simulator.getOutput("out"))
 
         // Output is locked while clock is tocked.
         simulator.setInputs("data" to true, "clock" to false)
-        assertEquals(false, simulator.getValue("out"))
+        assertEquals(false, simulator.getOutput("out"))
 
         // Output updates when clock ticks.
         simulator.setInputs("data" to true, "clock" to true)
-        assertEquals(true, simulator.getValue("out"))
+        assertEquals(true, simulator.getOutput("out"))
 
         // Output is locked while clock is ticked.
         simulator.setInputs("data" to false, "clock" to true)
-        assertEquals(true, simulator.getValue("out"))
+        assertEquals(true, simulator.getOutput("out"))
 
         // Output doesn't update when clock tocks.
         simulator.setInputs("data" to false, "clock" to false)
-        assertEquals(true, simulator.getValue("out"))
+        assertEquals(true, simulator.getOutput("out"))
 
         // Output updates when clock ticks.
         simulator.setInputs("data" to false, "clock" to true)
-        assertEquals(false, simulator.getValue("out"))
+        assertEquals(false, simulator.getOutput("out"))
     }
 
     // TODO: Make this pass.

@@ -29,7 +29,7 @@ class HardwareSimulatorImpl : HardwareSimulator {
         val hdlFiles = files.filter { file -> file.extension == "hdl" }
         val hdlTokens = hdlFiles.map { file -> tokenizer.tokenize(file.readText()) }
         val orderedHdlTokens = sorter.topologicallySortChipDefinitions(hdlTokens)
-        orderedHdlTokens.forEach { tokens -> parser.parseAndCacheLibraryPart(tokens) }
+        orderedHdlTokens.forEach { tokens -> parser.parse(tokens) }
     }
 
     override fun loadChip(path: String) {
@@ -48,7 +48,7 @@ class HardwareSimulatorImpl : HardwareSimulator {
         evaluator.setInputs(chipInputs)
     }
 
-    override fun getValue(gateName: String): Boolean {
+    override fun getOutput(gateName: String): Boolean {
         return evaluator.getValue(gateName)
     }
 
