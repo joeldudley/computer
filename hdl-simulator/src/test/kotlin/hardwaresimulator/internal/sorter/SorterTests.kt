@@ -21,9 +21,9 @@ class SorterTests {
         val tokensList = listOf(AND_HDL_TOKENS, NOT_HDL_TOKENS, NOT16_HDL_TOKENS, OR_HDL_TOKENS)
         val sortedElements = sorter.orderChipDefinitions(tokensList)
 
-        assertEquals(sortedElements[0], "Not")
-        assertEquals(sortedElements[1], "Or")
-        assertEquals(sortedElements[2], "Not16")
-        assertEquals(sortedElements[3], "And")
+        assertEquals(sortedElements[0], NOT_HDL_TOKENS)
+        assertEquals(sortedElements[1], OR_HDL_TOKENS)
+        assertEquals(sortedElements[2], NOT16_HDL_TOKENS)
+        assertEquals(sortedElements[3], AND_HDL_TOKENS)
     }
 }

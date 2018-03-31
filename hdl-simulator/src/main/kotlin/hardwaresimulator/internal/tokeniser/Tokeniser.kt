@@ -12,7 +12,7 @@ internal class Tokenizer {
 
     fun tokenize(program: String): List<String> {
         this.program = program
-        tokens = mutableListOf()
+        tokens.clear()
         pos = 0
         inWord = false
         word = ""

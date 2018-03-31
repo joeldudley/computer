@@ -1,13 +1,14 @@
 package hardwaresimulator.internal.sorter
 
-class ChipNameAndParts(val name: String, val dependencies: MutableSet<String>)
+data class ChipPartsAndTokens(val dependencies: MutableSet<String>, val tokens: List<String>)
 class SortNode(val name: String, val inEdges: MutableSet<SortNode>, val outEdges: MutableSet<SortNode>)
 
 class Sorter {
-    fun orderChipDefinitions(tokensList: List<List<String>>): List<String> {
-        val chipNamesAndParts = tokensList.map { tokens -> extractChipNameAndParts(tokens) }
+    fun orderChipDefinitions(tokensList: List<List<String>>): List<List<String>> {
+        // TODO: Split these steps into extracting the name and extracting the dependencies.
+        val chipMap = tokensList.map { tokens -> extractChipNameAndParts(tokens)}.toMap()
 
-        val sortNodes = createDependencyGraph(chipNamesAndParts)
+        val sortNodes = createDependencyGraph(chipMap)
 
         val sortedElements = mutableListOf<SortNode>()
         val nodesWithNoEdges = sortNodes.filter { it.inEdges.isEmpty() }.toMutableSet()
@@ -25,15 +26,15 @@ class Sorter {
             }
         }
 
-        return sortedElements.map { sortNode -> sortNode.name }
+        return sortedElements.map { sortNode -> chipMap[sortNode.name]!!.tokens }
     }
 
-    fun createDependencyGraph(chipNamesAndParts: List<ChipNameAndParts>): List<SortNode> {
+    fun createDependencyGraph(chipNamesAndParts: Map<String, ChipPartsAndTokens>): List<SortNode> {
         val sortNodeMap = mutableMapOf<String, SortNode>()
-        chipNamesAndParts.forEach { sortNodeMap.put(it.name, SortNode(it.name, mutableSetOf(), mutableSetOf())) }
-        for (chipNameAndParts in chipNamesAndParts) {
-            val sortNode = sortNodeMap[chipNameAndParts.name]!!
-            for (dependency in chipNameAndParts.dependencies) {
+        chipNamesAndParts.keys.forEach { sortNodeMap.put(it, SortNode(it, mutableSetOf(), mutableSetOf())) }
+        for ((name, chipPartsAndTokens) in chipNamesAndParts) {
+            val sortNode = sortNodeMap[name]!!
+            for (dependency in chipPartsAndTokens.dependencies) {
                 // TODO: Don't hardcode this.
                 if (dependency != "Nand") {
                     sortNodeMap[dependency]!!.outEdges.add(sortNode)
@@ -44,25 +45,25 @@ class Sorter {
         return sortNodeMap.values.toList()
     }
 
-    fun extractChipNameAndParts(tokens: List<String>): ChipNameAndParts {
+    fun extractChipNameAndParts(tokens: List<String>): Pair<String, ChipPartsAndTokens> {
         var pos = 1
         val name = tokens[pos]
-        val dependencies = mutableSetOf<String>()
+        val chip = ChipPartsAndTokens(mutableSetOf(), tokens)
 
         while (tokens[pos] != "PARTS:") {
             pos++
         }
         pos++
-        dependencies.add(tokens[pos])
+        chip.dependencies.add(tokens[pos])
         while (true) {
             while (tokens[pos] != ";") {
                 pos++
             }
             pos++
             if (tokens[pos] == "}") {
-                return ChipNameAndParts(name, dependencies)
+                return name to chip
             }
-            dependencies.add(tokens[pos])
+            chip.dependencies.add(tokens[pos])
         }
     }
 }

@@ -26,17 +26,14 @@ class HardwareSimulatorImpl : HardwareSimulator {
     private val evaluator = Evaluator()
 
     override fun loadChipDefinitions(vararg chipDefinitionFolders: String) {
-        val hdlFilesTokens = chipDefinitionFolders
-                .flatMap { folder -> File(folder).listFiles().toList() }
-                .filter { file -> file.extension == "hdl" }
-                .map { file -> file.readText() }
-                .map { text -> tokenizer.tokenize(text) }
-
-        val sortedHdlFiles = sorter.orderChipDefinitions(hdlFilesTokens)
-
-        // TODO: Easy way to map tokens to file they're from
-        // TODO: Sorter to return sorted list of tokens
-        // TODO: Cache library tokens in parser in order
+        val files = chipDefinitionFolders.flatMap { folder -> File(folder).listFiles().toList() }
+        val hdlFiles = files.filter { file -> file.extension == "hdl" }
+        val hdlFileTexts = hdlFiles.map { file -> file.readText() }
+        val hdlTokens = hdlFileTexts.map { text -> tokenizer.tokenize(text) }
+        val sortedHdlTokens = sorter.orderChipDefinitions(hdlTokens)
+        for (tokens in sortedHdlTokens) {
+            parser.parseAndCacheLibraryPart(tokens)
+        }
     }
 
     override fun loadChip(name: String) {
