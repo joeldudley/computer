@@ -9,5 +9,7 @@ interface Parser {
     /**
      * Parses the [tokens] and caches the resulting [ChipNode].
      */
-    fun parse(tokens: List<String>): ChipNode
+    fun parseAndCache(tokens: List<String>)
+
+    fun retrieve(name: String): ChipNode
 }

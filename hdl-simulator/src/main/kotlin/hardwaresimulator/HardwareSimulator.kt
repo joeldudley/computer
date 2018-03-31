@@ -1,9 +1,9 @@
 package hardwaresimulator
 
 interface HardwareSimulator {
-    fun loadLibraryChips(vararg paths: String)
+    fun loadChipDefinitions(vararg paths: String)
 
-    fun loadChip(path: String)
+    fun loadChip(name: String)
 
     fun setInputs(vararg inputValues: Pair<String, Boolean>)
 

@@ -13,17 +13,17 @@ class HardwareSimulatorImplTests {
     @Test
     fun `loading non-hdl file as chip throws error`() {
         exception.expect(IllegalArgumentException::class.java)
-        exception.expectMessage("Wrong file extension. Expected .hdl but got .abc.")
-        simulator.loadChip("src/test/resources/BadExt.abc")
+        exception.expectMessage("Chip BadExt is not cached.")
+        simulator.loadChip("BadExt")
     }
 
     @Test
-    fun `can specify library chips as files`() {
-        simulator.loadLibraryChips("src/test/resources/Not.hdl")
+    fun `can specify chip definitions as files`() {
+        simulator.loadChipDefinitions("src/test/resources/Not.hdl")
     }
 
     @Test
-    fun `can specify library chips as folders`() {
-        simulator.loadLibraryChips("src/test/resources")
+    fun `can specify chip definitions as folders`() {
+        simulator.loadChipDefinitions("src/test/resources")
     }
 }

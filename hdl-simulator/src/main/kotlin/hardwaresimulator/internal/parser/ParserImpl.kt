@@ -5,7 +5,7 @@ import hardwaresimulator.internal.*
 /**
  * Parses a list of tokens into a [Node.Chip].
  */
-internal class ParserImpl: Parser {
+internal class ParserImpl : Parser {
     private val cachedChips = mutableMapOf("Nand" to ChipNode("Nand", listOf(), listOf(), listOf()))
     // The current position in the list of tokens.
     private var pos = 0
@@ -15,17 +15,15 @@ internal class ParserImpl: Parser {
     /**
      * Parses the [tokens] into a [Node.Chip].
      */
-    override fun parse(tokens: List<String>): ChipNode {
+    override fun parseAndCache(tokens: List<String>) {
         pos = 0
         this.tokens = tokens
-        val chipName = parseChipName()
-        return if (chipName in cachedChips) {
-            cachedChips[chipName]!!
-        } else {
-            val chipNode = ChipNode(chipName, parseInputs(), parseOutputs(), parseParts())
-            cachedChips.put(chipNode.name, chipNode)
-            chipNode
-        }
+        val chipNode = ChipNode(parseChipName(), parseInputs(), parseOutputs(), parseParts())
+        cachedChips.put(chipNode.name, chipNode)
+    }
+
+    override fun retrieve(name: String): ChipNode {
+        return cachedChips[name] ?: throw IllegalArgumentException("Chip $name is not cached.")
     }
 
     /**

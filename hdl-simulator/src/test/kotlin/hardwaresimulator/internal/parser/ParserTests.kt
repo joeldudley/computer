@@ -13,6 +13,9 @@ class ParserTests {
     @Before
     fun before() {
         parser = ParserImpl()
+        listOf(NOT_HDL_TOKENS, AND_HDL_TOKENS, OR_HDL_TOKENS, NOT16_HDL_TOKENS).forEach {
+            tokens -> parser.parseAndCache(tokens)
+        }
     }
 
     @get:Rule
@@ -21,24 +24,21 @@ class ParserTests {
     // Test of a small gate (1/3).
     @Test
     fun notTest() {
-        val tree = parser.parse(NOT_HDL_TOKENS)
+        val tree = parser.retrieve("Not")
         assertEquals(NOT_CHIP, tree)
     }
 
     // Test of a small gate (2/3).
     @Test
     fun andTest() {
-        parser.parse(NOT_HDL_TOKENS)
-        val tree = parser.parse(AND_HDL_TOKENS)
+        val tree = parser.retrieve("And")
         assertEquals(AND_CHIP, tree)
     }
 
     // Test of a small gate (3/3).
     @Test
     fun orTest() {
-        parser.parse(NOT_HDL_TOKENS)
-        parser.parse(AND_HDL_TOKENS)
-        val tree = parser.parse(OR_HDL_TOKENS)
+        val tree = parser.retrieve("Or")
         assertEquals(OR_CHIP, tree)
     }
 
@@ -46,8 +46,7 @@ class ParserTests {
     // parts.
     @Test
     fun not16Test() {
-        parser.parse(NOT_HDL_TOKENS)
-        val tree = parser.parse(NOT16_HDL_TOKENS)
+        val tree = parser.retrieve("Not16")
         assertEquals(NOT16_CHIP, tree)
     }
 
@@ -56,7 +55,7 @@ class ParserTests {
     fun missingSemiColonAfterInsTest() {
         exception.expect(IllegalArgumentException::class.java)
         exception.expectMessage("Missing semi-colon after pins.")
-        parser.parse(MISSING_INS_SEMICOLON_TOKENS)
+        parser.parseAndCache(MISSING_INS_SEMICOLON_TOKENS)
     }
 
     // Test of a missing semi-colon after the outputs.
@@ -64,7 +63,7 @@ class ParserTests {
     fun missingSemiColonAfterOutsTest() {
         exception.expect(IllegalArgumentException::class.java)
         exception.expectMessage("Missing semi-colon after pins.")
-        parser.parse(MISSING_OUTS_SEMICOLON_TOKENS)
+        parser.parseAndCache(MISSING_OUTS_SEMICOLON_TOKENS)
     }
 
     // Test of a missing semi-colon after a part.
@@ -72,7 +71,7 @@ class ParserTests {
     fun missingSemiColonAfterPartTest() {
         exception.expect(IllegalArgumentException::class.java)
         exception.expectMessage("Missing semi-colon after part name.")
-        parser.parse(MISSING_PART_SEMICOLON_TOKENS)
+        parser.parseAndCache(MISSING_PART_SEMICOLON_TOKENS)
     }
 
     // Test of a missing 'CHIP' token.
@@ -80,7 +79,7 @@ class ParserTests {
     fun missingChipTokenTest() {
         exception.expect(IllegalArgumentException::class.java)
         exception.expectMessage("Expected token CHIP, got token NA.")
-        parser.parse(MISSING_CHIP_TOKEN_TOKENS)
+        parser.parseAndCache(MISSING_CHIP_TOKEN_TOKENS)
     }
 
     // Test of a missing 'IN' token.
@@ -88,7 +87,7 @@ class ParserTests {
     fun missingInTokenTest() {
         exception.expect(IllegalArgumentException::class.java)
         exception.expectMessage("Expected token IN, got token in.")
-        parser.parse(MISSING_IN_TOKEN_TOKENS)
+        parser.parseAndCache(MISSING_IN_TOKEN_TOKENS)
     }
 
     // Test of a missing 'OUT' token.
@@ -96,7 +95,7 @@ class ParserTests {
     fun missingOutTokenTest() {
         exception.expect(IllegalArgumentException::class.java)
         exception.expectMessage("Expected token OUT, got token out.")
-        parser.parse(MISSING_OUT_TOKEN_TOKENS)
+        parser.parseAndCache(MISSING_OUT_TOKEN_TOKENS)
     }
 
     // Test of a missing 'PARTS' token.
@@ -104,24 +103,24 @@ class ParserTests {
     fun missingPartsTokenTest() {
         exception.expect(IllegalArgumentException::class.java)
         exception.expectMessage("Expected token PARTS:, got token Nand.")
-        parser.parse(MISSING_PARTS_TOKEN_TOKENS)
+        parser.parseAndCache(MISSING_PARTS_TOKEN_TOKENS)
     }
 
     // Tests that the parser doesn't throw for an empty inputs list.
     @Test
     fun noInputTokensTest() {
-        parser.parse(NO_INPUTS_TOKENS)
+        parser.parseAndCache(NO_INPUTS_TOKENS)
     }
 
     // Tests that the parser doesn't throw for an empty outputs list.
     @Test
     fun noOutputTokensTest() {
-        parser.parse(NO_OUTPUTS_TOKENS)
+        parser.parseAndCache(NO_OUTPUTS_TOKENS)
     }
 
     // Tests that the parser doesn't throw for an empty parts list.
     @Test
     fun noPartTokensTest() {
-        parser.parse(NO_PARTS_TOKENS)
+        parser.parseAndCache(NO_PARTS_TOKENS)
     }
 }

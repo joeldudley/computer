@@ -24,21 +24,16 @@ class HardwareSimulatorImpl : HardwareSimulator {
     private val generator = GeneratorImpl()
     private val evaluator = EvaluatorImpl()
 
-    override fun loadLibraryChips(vararg paths: String) {
+    override fun loadChipDefinitions(vararg paths: String) {
         val files = pathsToFiles(paths.toList())
         val hdlFiles = files.filter { file -> file.extension == "hdl" }
         val hdlTokens = hdlFiles.map { file -> tokenizer.tokenize(file.readText()) }
         val orderedHdlTokens = sorter.topologicallySortChipDefinitions(hdlTokens)
-        orderedHdlTokens.forEach { tokens -> parser.parse(tokens) }
+        orderedHdlTokens.forEach { tokens -> parser.parseAndCache(tokens) }
     }
 
-    override fun loadChip(path: String) {
-        val file = File(path)
-        if (file.extension != "hdl") {
-            throw IllegalArgumentException("Wrong file extension. Expected .hdl but got .${file.extension}.")
-        }
-        val tokens = tokenizer.tokenize(file.readText())
-        val node = parser.parse(tokens)
+    override fun loadChip(name: String) {
+        val node = parser.retrieve(name)
         val chip = generator.generateChip(node)
         evaluator.loadChip(chip)
     }

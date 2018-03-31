@@ -1,18 +1,22 @@
 package hardwaresimulator
 
+import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 
 class IntegrationTests {
-    private val simulator = HardwareSimulatorImpl()
-    init {
-        simulator.loadLibraryChips("src/test/resources")
+    private lateinit var simulator: HardwareSimulator
+
+    @Before
+    fun before() {
+        simulator = HardwareSimulatorImpl()
+        simulator.loadChipDefinitions("src/test/resources")
     }
 
     // Test of a small, non-recursive gate (1/3).
     @Test
     fun notTest() {
-        simulator.loadChip("src/test/resources/Not.hdl")
+        simulator.loadChip("Not")
 
         simulator.setInputs("in" to false)
         assertEquals(true, simulator.getOutput("out"))
@@ -30,7 +34,7 @@ class IntegrationTests {
     // Test of a small, non-recursive gate (2/3).
     @Test
     fun andTest() {
-        simulator.loadChip("src/test/resources/And.hdl")
+        simulator.loadChip("And")
 
         simulator.setInputs("a" to false, "b" to false)
         assertEquals(false, simulator.getOutput("out"))
@@ -48,7 +52,7 @@ class IntegrationTests {
     // Test of a small, non-recursive gate (3/3).
     @Test
     fun orTest() {
-        simulator.loadChip("src/test/resources/Or.hdl")
+        simulator.loadChip("Or")
 
         simulator.setInputs("a" to false, "b" to false)
         assertEquals(false, simulator.getOutput("out"))
@@ -67,7 +71,7 @@ class IntegrationTests {
     // It's part of the DFF, and no solution is provided as part of Nand2Tetris.
     @Test
     fun nand3WayTest() {
-        simulator.loadChip("src/test/resources/Nand3Way.hdl")
+        simulator.loadChip("Nand3Way")
 
         simulator.setInputs("a" to false, "b" to false, "c" to false)
         assertEquals(true, simulator.getOutput("out"))
@@ -97,7 +101,7 @@ class IntegrationTests {
     // Test of a small recursive gate.
     @Test
     fun dffTest() {
-        simulator.loadChip("src/test/resources/DFF.hdl")
+        simulator.loadChip("DFF")
 
         simulator.setInputs("data" to false, "clock" to false)
         assertEquals(false, simulator.getOutput("out"))
@@ -127,7 +131,7 @@ class IntegrationTests {
     // Test of a gate with wide inputs and outputs.
     @Test
     fun not16Test() {
-        simulator.loadChip("src/test/resources/Not16.hdl")
+        simulator.loadChip("Not16")
         // TODO: Write test cases. Need to find a way to pass in wide inputs/outputs.
     }
 }
