@@ -4,11 +4,12 @@ sealed class Node
 
 data class ChipNode(
         val name: String,
-        val inputs: List<IOPinNode>,
-        val outputs: List<IOPinNode>,
+        val inputs: List<IONode>,
+        val outputs: List<IONode>,
         val parts: List<PartNode>) : Node()
 
-data class IOPinNode(val name: String, val width: Int) : Node()
-data class InternalPinNode(val name: String, val index: Int) : Node()
+data class IONode(val name: String, val width: Int) : Node()
+data class AssignmentNode(val lhs: LHSNode, val rhs: RHSNode) : Node()
 data class PartNode(val chip: ChipNode, val assignments: List<AssignmentNode>) : Node()
-data class AssignmentNode(val lhs: InternalPinNode, val rhs: InternalPinNode) : Node()
+data class LHSNode(val name: String) : Node()
+data class RHSNode(val name: String, val indexed: Boolean, val startIndex: Int?, val endIndex: Int?) : Node()

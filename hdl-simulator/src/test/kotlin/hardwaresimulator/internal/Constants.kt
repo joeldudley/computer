@@ -34,22 +34,22 @@ val NOT_CHIP = {
     val nandNode = ChipNode("Nand", listOf(), listOf(), listOf())
     val nandAssignments = listOf(
             AssignmentNode(
-                    InternalPinNode("a", 0),
-                    InternalPinNode("in", 0)
+                    LHSNode("a"),
+                    RHSNode("in", false, null, null)
             ),
             AssignmentNode(
-                    InternalPinNode("b", 0),
-                    InternalPinNode("in", 0)
+                    LHSNode("b"),
+                    RHSNode("in", false, null, null)
             ),
             AssignmentNode(
-                    InternalPinNode("out", 0),
-                    InternalPinNode("out", 0)
+                    LHSNode("out"),
+                    RHSNode("out", false, null, null)
             )
     )
     val nandPartNode = PartNode(nandNode, nandAssignments)
 
-    val notIns = listOf(IOPinNode("in", 1))
-    val notOuts = listOf(IOPinNode("out", 1))
+    val notIns = listOf(IONode("in", 1))
+    val notOuts = listOf(IONode("out", 1))
     val notParts = listOf(nandPartNode)
     val notNode = ChipNode("Not", notIns, notOuts, notParts)
 
@@ -60,38 +60,38 @@ val AND_CHIP = {
     val nandNode = ChipNode("Nand", listOf(), listOf(), listOf())
     val nandAssignments = listOf(
             AssignmentNode(
-                    InternalPinNode("a", 0),
-                    InternalPinNode("a", 0)
+                    LHSNode("a"),
+                    RHSNode("a", false, null, null)
             ),
             AssignmentNode(
-                    InternalPinNode("b", 0),
-                    InternalPinNode("b", 0)
+                    LHSNode("b"),
+                    RHSNode("b", false, null, null)
             ),
             AssignmentNode(
-                    InternalPinNode("out", 0),
-                    InternalPinNode("nandOut", 0)
+                    LHSNode("out"),
+                    RHSNode("nandOut", false, null, null)
             )
     )
     val nandPartNode = PartNode(nandNode, nandAssignments)
 
     val notAssignments = listOf(
             AssignmentNode(
-                    InternalPinNode("in", 0),
-                    InternalPinNode("nandOut", 0)
+                    LHSNode("in"),
+                    RHSNode("nandOut", false, null, null)
             ),
             AssignmentNode(
-                    InternalPinNode("out", 0),
-                    InternalPinNode("out", 0)
+                    LHSNode("out"),
+                    RHSNode("out", false, null, null)
             )
     )
     val notPartNode = PartNode(NOT_CHIP, notAssignments)
 
     val andIns = listOf(
-            IOPinNode("a", 1),
-            IOPinNode("b", 1)
+            IONode("a", 1),
+            IONode("b", 1)
     )
     val andOuts = listOf(
-            IOPinNode("out", 1)
+            IONode("out", 1)
     )
     val andParts = listOf(nandPartNode, notPartNode)
     val andNode = ChipNode("And", andIns, andOuts, andParts)
@@ -102,24 +102,24 @@ val AND_CHIP = {
 val OR_CHIP = {
     val not1Assignments = listOf(
             AssignmentNode(
-                    InternalPinNode("in", 0),
-                    InternalPinNode("a", 0)
+                    LHSNode("in"),
+                    RHSNode("a", false, null, null)
             ),
             AssignmentNode(
-                    InternalPinNode("out", 0),
-                    InternalPinNode("notA", 0)
+                    LHSNode("out"),
+                    RHSNode("notA", false, null, null)
             )
     )
     val not1PartNode = PartNode(NOT_CHIP, not1Assignments)
 
     val not2Assignments = listOf(
             AssignmentNode(
-                    InternalPinNode("in", 0),
-                    InternalPinNode("b", 0)
+                    LHSNode("in"),
+                    RHSNode("b", false, null, null)
             ),
             AssignmentNode(
-                    InternalPinNode("out", 0),
-                    InternalPinNode("notB", 0)
+                    LHSNode("out"),
+                    RHSNode("notB", false, null, null)
             )
     )
     val not2PartNode = PartNode(NOT_CHIP, not2Assignments)
@@ -127,26 +127,26 @@ val OR_CHIP = {
     val nandNode = ChipNode("Nand", listOf(), listOf(), listOf())
     val nandAssignments = listOf(
             AssignmentNode(
-                    InternalPinNode("a", 0),
-                    InternalPinNode("notA", 0)
+                    LHSNode("a"),
+                    RHSNode("notA", false, null, null)
             ),
             AssignmentNode(
-                    InternalPinNode("b", 0),
-                    InternalPinNode("notB", 0)
+                    LHSNode("b"),
+                    RHSNode("notB", false, null, null)
             ),
             AssignmentNode(
-                    InternalPinNode("out", 0),
-                    InternalPinNode("out", 0)
+                    LHSNode("out"),
+                    RHSNode("out", false, null, null)
             )
     )
     val nandPartNode = PartNode(nandNode, nandAssignments)
 
     val orIns = listOf(
-            IOPinNode("a", 1),
-            IOPinNode("b", 1)
+            IONode("a", 1),
+            IONode("b", 1)
     )
     val orOuts = listOf(
-            IOPinNode("out", 1)
+            IONode("out", 1)
     )
     val orParts = listOf(not1PartNode, not2PartNode, nandPartNode)
     val orNode = ChipNode("Or", orIns, orOuts, orParts)
@@ -156,20 +156,20 @@ val OR_CHIP = {
 
 val NOT16_CHIP = {
     val not16Ins = listOf(
-            IOPinNode("in", 16)
+            IONode("in", 16)
     )
     val not16Outs = listOf(
-            IOPinNode("out", 16)
+            IONode("out", 16)
     )
     val not16Parts = (0..15).map {
         val notAssignments = listOf(
                 AssignmentNode(
-                        InternalPinNode("in", 0),
-                        InternalPinNode("in", it)
+                        LHSNode("in"),
+                        RHSNode("in", true, it, it)
                 ),
                 AssignmentNode(
-                        InternalPinNode("out", 0),
-                        InternalPinNode("out", it)
+                        LHSNode("out"),
+                        RHSNode("out", true, it, it)
                 ))
         PartNode(NOT_CHIP, notAssignments)
     }

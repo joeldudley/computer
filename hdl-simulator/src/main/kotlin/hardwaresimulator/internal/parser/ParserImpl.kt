@@ -46,7 +46,7 @@ internal class ParserImpl : Parser {
      *
      * @return The inputs.
      */
-    private fun parseInputs(): List<IOPinNode> {
+    private fun parseInputs(): List<IONode> {
         if (tokens[pos] != "IN") throw IllegalArgumentException("Expected token IN, got token ${tokens[pos]}.")
         pos++
         return parsePins("OUT")
@@ -57,7 +57,7 @@ internal class ParserImpl : Parser {
      *
      * @return The inputs.
      */
-    private fun parseOutputs(): List<IOPinNode> {
+    private fun parseOutputs(): List<IONode> {
         if (tokens[pos] != "OUT") throw IllegalArgumentException("Expected token OUT, got token ${tokens[pos]}.")
         pos++
         return parsePins("PARTS:")
@@ -70,8 +70,8 @@ internal class ParserImpl : Parser {
      *   missing and the parser has overrun.
      * @return The pins.
      */
-    private fun parsePins(trailingToken: String): List<IOPinNode> {
-        val pins = mutableListOf<IOPinNode>()
+    private fun parsePins(trailingToken: String): List<IONode> {
+        val pins = mutableListOf<IONode>()
         // Using this check instead of `true` correctly handles the case of
         // no pins.
         while (tokens[pos] != ";") {
@@ -90,7 +90,7 @@ internal class ParserImpl : Parser {
                 1
             }
 
-            val pin = IOPinNode(pinName, pinWidth)
+            val pin = IONode(pinName, pinWidth)
             pins.add(pin)
 
             if (tokens[pos] == ",") pos++
@@ -137,7 +137,7 @@ internal class ParserImpl : Parser {
 
         val assignments = mutableListOf<AssignmentNode>()
         while (true) {
-            val lhs = InternalPinNode(tokens[pos], 0)
+            val lhs = LHSNode(tokens[pos])
             pos++
 
             if (tokens[pos] != "=") throw IllegalArgumentException("Expected token =, got token ${tokens[pos]}.")
@@ -146,19 +146,18 @@ internal class ParserImpl : Parser {
             val rhsName = tokens[pos]
             pos++
 
-            val rhsIndex = if (tokens[pos] == "[") {
+            // TODO: Handle elipsis indicating width.
+            val rhs = if (tokens[pos] == "[") {
                 // Skip the opening square bracket.
                 pos++
                 val index = tokens[pos].toInt()
                 pos++
                 // Skip the closing square bracket.
                 pos++
-                index
+                RHSNode(rhsName, true, index, index)
             } else {
-                0
+                RHSNode(rhsName, false, null, null)
             }
-
-            val rhs = InternalPinNode(rhsName, rhsIndex)
 
             val assignment = AssignmentNode(lhs, rhs)
             assignments.add(assignment)
