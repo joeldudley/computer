@@ -39,6 +39,9 @@ class HardwareSimulatorImpl : HardwareSimulator {
 
     override fun loadChip(path: String) {
         val file = File(path)
+        if (file.extension != "hdl") {
+            throw IllegalArgumentException("Wrong file extension. Expected .hdl but got .${file.extension}.")
+        }
         val text = file.readText()
         val tokens = tokenizer.tokenize(text)
         val node = parser.parse(tokens)
