@@ -4,31 +4,43 @@ import hardwaresimulator.Chip
 import hardwaresimulator.internal.*
 
 // TODO: Correct this. Need to use handle indexes in square brackets.
-class GeneratorImpl: Generator {
+class GeneratorImpl : Generator {
     override fun generateChip(chipNode: ChipNode): Chip {
-        // Stage 1: Create a list of variables used in the chip definition,
-        // including inputs and outputs.
-        val chipVariableNames = getChipVariableNames(chipNode)
+        // TODO: New approach here:
+        // * Get input and output variable names
+        // * Create gates for the inputs only
+            // * The output gates already exist as the outputs of the chips
+        // * Create a list of all the parts
+        // * Get the possible RHS as the input gates plus the outputs of the various chips
+        // * Link them up
+        // * Return input gates and output gates from chips
 
-        // Step 2.1: Map each variable name to a gate.
-        val chipGates = createChipGates(chipVariableNames)
-        // Step 2.2: Create and hook up the chip's parts.
-        generateAndHookUpParts(chipNode, chipGates.inputOutputAndInternalGates)
-        // Step 2.3: Create and return chip.
-        return Chip(chipGates.inputGates, chipGates.outputGates)
+        val chipVariableNames = getChipVariableNames(chipNode)
+        val chipInputGates = chipVariableNames.inputGateNames.map { name -> name to PassthroughGate() }.toMap()
+        val parts = generateParts(chipNode)
+
+        // TODO: Check for overlap and throw an error for sanity checking.
+        val allRHSGates = mutableMapOf<String, Gate>()
+        parts.forEach { part ->
+            part.outputs.map { output ->
+                val key = output.rhs.name
+                val value = part.chip.outputGateMap[output.lhs.name]!!
+                allRHSGates.put(key, value)
+            }
+        }
+        allRHSGates.putAll(chipInputGates)
+
+        hookUpParts(parts, allRHSGates)
+
+        val chipOutputGates = chipVariableNames.outputGateNames.map { it to allRHSGates[it]!! }.toMap()
+        return Chip(chipInputGates, chipOutputGates)
     }
 
     private class ChipVariableNames(
             val inputGateNames: List<String>,
-            val outputGateNames: List<String>,
-            val internalGateNames: List<String>)
+            val outputGateNames: List<String>)
 
-    private class ChipGates(
-            val inputGates: Map<String, Gate>,
-            val outputGates: Map<String, Gate>,
-            internalGates: Map<String, Gate>) {
-        val inputOutputAndInternalGates = inputGates + outputGates + internalGates
-    }
+    private class Part(val chip: Chip, val inputs: List<AssignmentNode>, val outputs: List<AssignmentNode>)
 
     private fun generateNand(): Chip {
         val nandGate = NandGate()
@@ -49,66 +61,44 @@ class GeneratorImpl: Generator {
     private fun getChipVariableNames(chipNode: ChipNode): ChipVariableNames {
         val inputNames = chipNode.inputs.map { it.name }
         val outputNames = chipNode.outputs.map { it.name }
-        // All variables used internally by the parts, including the input and
-        // output variables.
-        val assignmentRHSs = chipNode.parts.flatMap { part ->
-            part.assignments.map { it.rhs.name }
-        }
-        // All variables used internally by the parts, excluding the input and
-        // output variables.
-        val internalVariableNames = assignmentRHSs.filter { variableName ->
-            variableName !in inputNames && variableName !in outputNames
-        }
-
-        return ChipVariableNames(inputNames, outputNames, internalVariableNames)
+        return ChipVariableNames(inputNames, outputNames)
     }
 
-    private fun createChipGates(chipVariableNames: ChipVariableNames): ChipGates {
-        val inputGates = chipVariableNames.inputGateNames.map { name -> name to PassthroughGate() }.toMap()
-        val outputGates = chipVariableNames.outputGateNames.map { name -> name to PassthroughGate() }.toMap()
-        val internalVariableGates = chipVariableNames.internalGateNames.map { name -> name to PassthroughGate() }.toMap()
-        return ChipGates(inputGates, outputGates, internalVariableGates)
-    }
+    private fun generateParts(chipNode: ChipNode): List<Part> {
+        return chipNode.parts.map { partNode ->
+            val chip = if (partNode.chip.name == "Nand") {
+                generateNand()
+            } else {
+                generateChip(partNode.chip)
+            }
 
-    private fun generateAndHookUpParts(chipNode: ChipNode, inputOutputAndInternalGates: Map<String, Gate>) {
-        chipNode.parts.forEach { part ->
-            generateAndHookUpPart(part, inputOutputAndInternalGates)
+            val inputs = mutableListOf<AssignmentNode>()
+            val outputs = mutableListOf<AssignmentNode>()
+
+            for (assignment in partNode.assignments) {
+                when (assignment.lhs.name) {
+                    in chip.inputGateMap -> inputs.add(assignment)
+                    in chip.outputGateMap -> outputs.add(assignment)
+                    else -> throw IllegalArgumentException("Assignment LHS does not exist in part inputs or outputs.")
+                }
+            }
+
+            Part(chip, inputs, outputs)
         }
     }
 
-    private fun generateAndHookUpPart(partNode: PartNode, inputOutputAndInternalGates: Map<String, Gate>) {
-        // Step 1: Generate a chip for the part.
-        val partChip = if (partNode.chip.name == "Nand") {
-            generateNand()
-        } else {
-            generateChip(partNode.chip)
-        }
+    private fun hookUpParts(parts: List<Part>, allRHSGates: Map<String, Gate>) {
+        parts.forEach { part ->
+            // Step 2: Hook up all the gates.
+            part.inputs.forEach { assignment ->
+                val rhsGate = allRHSGates[assignment.rhs.name]
+                        ?: throw IllegalArgumentException("Assignment RHS not found in chip's input, output or internal gates.")
 
-        // TODO: At this stage, check that the widths are correct - rhs width == lhs width
+                val lhsGate = part.chip.inputGateMap[assignment.lhs.name]
+                        ?: throw IllegalArgumentException("LHS is not input of part.")
 
-        // Step 2: Hook up all the gates.
-        partNode.assignments.forEach { assignment ->
-            val rhsName = assignment.rhs.name
-            val rhsGate = inputOutputAndInternalGates[rhsName]
-                    ?: throw IllegalArgumentException("Assignment RHS not found in chip's input, output or internal gates.")
-
-            val lhsName = assignment.lhs.name
-            when (lhsName) {
-                in partChip.inputGateMap -> {
-                    val lhsGate = partChip.inputGateMap[lhsName]
-                            ?: throw IllegalArgumentException("LHS is not input of part.")
-                    lhsGate.in1 = rhsGate
-                    rhsGate.outputs.add(lhsGate)
-                }
-                in partChip.outputGateMap -> {
-                    val lhsGate = partChip.outputGateMap[lhsName]
-                            ?: throw IllegalArgumentException("LHS is not output of part.")
-                    rhsGate.in1 = lhsGate
-                    lhsGate.outputs.add(rhsGate)
-                }
-                else -> {
-                    throw IllegalArgumentException("LHS is neither input nor output of part.")
-                }
+                lhsGate.in1 = rhsGate
+                rhsGate.outputs.add(lhsGate)
             }
         }
     }
