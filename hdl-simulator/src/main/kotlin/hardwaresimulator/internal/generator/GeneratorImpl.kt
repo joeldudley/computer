@@ -6,19 +6,27 @@ import hardwaresimulator.internal.*
 // TODO: Need to use handle indexes in square brackets.
 class GeneratorImpl : Generator {
     override fun generateChip(chipNode: ChipNode): Chip {
-        val chipInputNames = chipNode.inputs.map { inputNode -> inputNode.name }
-        val chipInputGateMap = chipInputNames.map { inputName -> inputName to PassthroughGate() }.toMap()
-        val partChipsAndAssignments = extractPartsAndAssignments(chipNode)
+        val inputGateMap = generateInputGateMap(chipNode)
 
-        val partOutputRHSGateMap = extractPartOutputRHSGateMap(partChipsAndAssignments)
+        val partsAndAssignments = generatePartsAndSplitAssignments(chipNode)
+        val partVariableGateMap = extractVariableGateMap(partsAndAssignments)
 
-        val allRHSGateMap = chipInputGateMap + partOutputRHSGateMap
+        val rhsGateMap = inputGateMap + partVariableGateMap
 
-        partChipsAndAssignments.forEach { part -> hookUpPart(part, allRHSGateMap) }
+        hookUpParts(partsAndAssignments, rhsGateMap)
 
         val chipOutputNames = chipNode.outputs.map { outputNode -> outputNode.name }
-        val outputGateMap = chipOutputNames.map { outputName -> outputName to allRHSGateMap[outputName]!! }.toMap()
-        return Chip(chipInputGateMap, outputGateMap)
+        val outputGateMap = chipOutputNames.map { outputName -> outputName to rhsGateMap[outputName]!! }.toMap()
+        return Chip(inputGateMap, outputGateMap)
+    }
+
+    private fun generateInputGateMap(chipNode: ChipNode): Map<String, Gate> {
+        val inputNames = chipNode.inputs.map { inputNode -> inputNode.name }
+        return inputNames.map { inputName -> inputName to PassthroughGate() }.toMap()
+    }
+
+    private fun hookUpParts(partsAndAssignments: List<PartAndAssignments>, rhsGateMap: Map<String, Gate>) {
+        partsAndAssignments.forEach { part -> hookUpPart(part, rhsGateMap) }
     }
 
     private data class PartAndAssignments(
@@ -26,29 +34,38 @@ class GeneratorImpl : Generator {
             val inputAssignments: List<AssignmentNode>,
             val outputAssignments: List<AssignmentNode>)
 
-    private fun extractPartsAndAssignments(chipNode: ChipNode): List<PartAndAssignments> {
-        return chipNode.parts.map { partNode ->
-            val chip = if (partNode.chip.name == "Nand") {
-                generateNand()
-            } else {
-                generateChip(partNode.chip)
-            }
-
-            val inputAssignments = mutableListOf<AssignmentNode>()
-            val outputAssignments = mutableListOf<AssignmentNode>()
-            for (assignment in partNode.assignments) {
-                when (assignment.lhs.name) {
-                    in chip.inputGateMap -> inputAssignments += assignment
-                    in chip.outputGateMap -> outputAssignments += assignment
-                    else -> throw IllegalArgumentException("Assignment LHS does not exist in part inputs or outputs.")
-                }
-            }
-
-            PartAndAssignments(chip, inputAssignments, outputAssignments)
+    private fun generatePartsAndSplitAssignments(chipNode: ChipNode): List<PartAndAssignments> {
+        return chipNode.parts.map { part ->
+            val partChip = generatePart(part)
+            val partAssignments = part.assignments
+            val (inputAssignments, outputAssignments) = splitInputAndOutputAssignments(partChip, partAssignments)
+            PartAndAssignments(partChip, inputAssignments, outputAssignments)
         }
     }
 
-    private fun extractPartOutputRHSGateMap(partChipsAndAssignments: List<PartAndAssignments>): Map<String, Gate> {
+    private fun generatePart(partNode: PartNode): Chip {
+        return if (partNode.chip.name == "Nand") {
+            generateNand()
+        } else {
+            generateChip(partNode.chip)
+        }
+    }
+
+    private fun splitInputAndOutputAssignments(part: Chip, assignments: List<AssignmentNode>): Pair<List<AssignmentNode>, List<AssignmentNode>> {
+        val inputAssignments = mutableListOf<AssignmentNode>()
+        val outputAssignments = mutableListOf<AssignmentNode>()
+        for (assignment in assignments) {
+            when (assignment.lhs.name) {
+                in part.inputGateMap -> inputAssignments += assignment
+                in part.outputGateMap -> outputAssignments += assignment
+                else -> throw IllegalArgumentException("Assignment LHS does not exist in part inputs or outputs.")
+            }
+        }
+
+        return inputAssignments to outputAssignments
+    }
+
+    private fun extractVariableGateMap(partChipsAndAssignments: List<PartAndAssignments>): Map<String, Gate> {
         return partChipsAndAssignments.flatMap { part ->
             part.outputAssignments.map { output ->
                 val key = output.rhs.name
