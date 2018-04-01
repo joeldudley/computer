@@ -6,7 +6,11 @@ import hardwaresimulator.internal.*
  * Parses a list of tokens into a [Node.Chip].
  */
 internal class ParserImpl : Parser {
-    private val cachedChips = mutableMapOf("Nand" to ChipNode("Nand", listOf(), listOf(), listOf()))
+    private val cachedChips = mutableMapOf("Nand" to ChipNode(
+            "Nand",
+            listOf(IONode("a", 1), IONode("b", 1)),
+            listOf(IONode("out", 1)),
+            listOf()))
     // The current position in the list of tokens.
     private var pos = 0
     // The list of tokens to parse.
@@ -159,7 +163,14 @@ internal class ParserImpl : Parser {
                 RHSNode(rhsName, false, null, null)
             }
 
-            val assignment = AssignmentNode(lhs, rhs)
+            val assignment = if (lhs.name in part.inputs.map { it.name }) {
+                InputAssignmentNode(lhs, rhs)
+            } else if (lhs.name in part.outputs.map { it.name }) {
+                OutputAssignmentNode(lhs, rhs)
+            } else {
+                // TODO: Better error message.
+                throw IllegalArgumentException("Assignment not in inputs or outputs.")
+            }
             assignments.add(assignment)
 
             if (tokens[pos] == ",") pos++
