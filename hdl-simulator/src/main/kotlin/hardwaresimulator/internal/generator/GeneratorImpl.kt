@@ -37,9 +37,7 @@ class GeneratorImpl : Generator {
     private fun generatePartsAndSplitAssignments(chipNode: ChipNode): List<PartAndAssignments> {
         return chipNode.parts.map { partNode ->
             val part = generatePart(partNode)
-            val partAssignments = partNode.assignments
-            val (inputAssignments, outputAssignments) = splitInputAndOutputAssignments(part, partAssignments)
-            PartAndAssignments(part, inputAssignments, outputAssignments)
+            PartAndAssignments(part, partNode.inputAssignments, partNode.outputAssignments)
         }
     }
 
@@ -49,20 +47,6 @@ class GeneratorImpl : Generator {
         } else {
             generateChip(partNode.chip)
         }
-    }
-
-    private fun splitInputAndOutputAssignments(part: Chip, assignments: List<AssignmentNode>): Pair<List<AssignmentNode>, List<AssignmentNode>> {
-        val inputAssignments = mutableListOf<AssignmentNode>()
-        val outputAssignments = mutableListOf<AssignmentNode>()
-        for (assignment in assignments) {
-            when (assignment.lhs.name) {
-                in part.inputGateMap -> inputAssignments += assignment
-                in part.outputGateMap -> outputAssignments += assignment
-                else -> throw IllegalArgumentException("Assignment LHS does not exist in part inputs or outputs.")
-            }
-        }
-
-        return inputAssignments to outputAssignments
     }
 
     private fun generateVariableGateMap(partsAndAssignments: List<PartAndAssignments>): Map<String, Gate> {

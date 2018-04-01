@@ -139,7 +139,8 @@ internal class ParserImpl : Parser {
         if (tokens[pos] != "(") throw IllegalArgumentException("Expected token (, got token ${tokens[pos]}.")
         pos++
 
-        val assignments = mutableListOf<AssignmentNode>()
+        val inputAssignments = mutableListOf<AssignmentNode>()
+        val outputAssignments = mutableListOf<AssignmentNode>()
         while (true) {
             val lhs = LHSNode(tokens[pos])
             pos++
@@ -163,15 +164,15 @@ internal class ParserImpl : Parser {
                 RHSNode(rhsName, false, null, null)
             }
 
-            val assignment = if (lhs.name in part.inputs.map { it.name }) {
-                InputAssignmentNode(lhs, rhs)
+            val assignment = AssignmentNode(lhs, rhs)
+            if (lhs.name in part.inputs.map { it.name }) {
+                inputAssignments.add(assignment)
             } else if (lhs.name in part.outputs.map { it.name }) {
-                OutputAssignmentNode(lhs, rhs)
+                outputAssignments.add(assignment)
             } else {
                 // TODO: Better error message.
                 throw IllegalArgumentException("Assignment not in inputs or outputs.")
             }
-            assignments.add(assignment)
 
             if (tokens[pos] == ",") pos++
             else if (tokens[pos] == ")") break
@@ -181,6 +182,6 @@ internal class ParserImpl : Parser {
         if (tokens[pos] != ";") throw IllegalArgumentException("Missing semi-colon after part name.")
         pos++
 
-        return PartNode(part, assignments)
+        return PartNode(part, inputAssignments, outputAssignments)
     }
 }

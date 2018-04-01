@@ -36,21 +36,21 @@ val NOT_CHIP = {
             listOf(IONode("a", 1), IONode("b", 1)),
             listOf(IONode("out", 1)),
             listOf())
-    val nandAssignments = listOf(
-            InputAssignmentNode(
+    val nandInputAssignments = listOf(
+            AssignmentNode(
                     LHSNode("a"),
                     RHSNode("in", false, null, null)
             ),
-            InputAssignmentNode(
+            AssignmentNode(
                     LHSNode("b"),
                     RHSNode("in", false, null, null)
-            ),
-            OutputAssignmentNode(
+            ))
+    val nandOutputAssignments = listOf(
+            AssignmentNode(
                     LHSNode("out"),
                     RHSNode("out", false, null, null)
-            )
-    )
-    val nandPartNode = PartNode(nandNode, nandAssignments)
+            ))
+    val nandPartNode = PartNode(nandNode, nandInputAssignments, nandOutputAssignments)
 
     val notIns = listOf(IONode("in", 1))
     val notOuts = listOf(IONode("out", 1))
@@ -66,33 +66,33 @@ val AND_CHIP = {
             listOf(IONode("a", 1), IONode("b", 1)),
             listOf(IONode("out", 1)),
             listOf())
-    val nandAssignments = listOf(
-            InputAssignmentNode(
+    val nandInputAssignments = listOf(
+            AssignmentNode(
                     LHSNode("a"),
                     RHSNode("a", false, null, null)
             ),
-            InputAssignmentNode(
+            AssignmentNode(
                     LHSNode("b"),
                     RHSNode("b", false, null, null)
-            ),
-            OutputAssignmentNode(
+            ))
+    val nandOutputAssignments = listOf(
+            AssignmentNode(
                     LHSNode("out"),
                     RHSNode("nandOut", false, null, null)
-            )
-    )
-    val nandPartNode = PartNode(nandNode, nandAssignments)
+            ))
+    val nandPartNode = PartNode(nandNode, nandInputAssignments, nandOutputAssignments)
 
-    val notAssignments = listOf(
-            InputAssignmentNode(
+    val notInputAssignments = listOf(
+            AssignmentNode(
                     LHSNode("in"),
                     RHSNode("nandOut", false, null, null)
-            ),
-            OutputAssignmentNode(
+            ))
+    val notOutputAssignments = listOf(
+            AssignmentNode(
                     LHSNode("out"),
                     RHSNode("out", false, null, null)
-            )
-    )
-    val notPartNode = PartNode(NOT_CHIP, notAssignments)
+            ))
+    val notPartNode = PartNode(NOT_CHIP, notInputAssignments, notOutputAssignments)
 
     val andIns = listOf(
             IONode("a", 1),
@@ -108,50 +108,50 @@ val AND_CHIP = {
 }()
 
 val OR_CHIP = {
-    val not1Assignments = listOf(
-            InputAssignmentNode(
+    val not1InputAssignments = listOf(
+            AssignmentNode(
                     LHSNode("in"),
                     RHSNode("a", false, null, null)
-            ),
-            OutputAssignmentNode(
+            ))
+    val not1OutputAssignments = listOf(
+            AssignmentNode(
                     LHSNode("out"),
                     RHSNode("notA", false, null, null)
-            )
-    )
-    val not1PartNode = PartNode(NOT_CHIP, not1Assignments)
+            ))
+    val not1PartNode = PartNode(NOT_CHIP, not1InputAssignments, not1OutputAssignments)
 
-    val not2Assignments = listOf(
-            InputAssignmentNode(
+    val not2InputAssignments = listOf(
+            AssignmentNode(
                     LHSNode("in"),
                     RHSNode("b", false, null, null)
-            ),
-            OutputAssignmentNode(
+            ))
+    val not2OutputAssignments = listOf(
+            AssignmentNode(
                     LHSNode("out"),
                     RHSNode("notB", false, null, null)
-            )
-    )
-    val not2PartNode = PartNode(NOT_CHIP, not2Assignments)
+            ))
+    val not2PartNode = PartNode(NOT_CHIP, not2InputAssignments, not2OutputAssignments)
 
     val nandNode = ChipNode(
             "Nand",
             listOf(IONode("a", 1), IONode("b", 1)),
             listOf(IONode("out", 1)),
             listOf())
-    val nandAssignments = listOf(
-            InputAssignmentNode(
+    val nandInputAssignments = listOf(
+            AssignmentNode(
                     LHSNode("a"),
                     RHSNode("notA", false, null, null)
             ),
-            InputAssignmentNode(
+            AssignmentNode(
                     LHSNode("b"),
                     RHSNode("notB", false, null, null)
-            ),
-            OutputAssignmentNode(
+            ))
+    val nandOutputAssignments = listOf(
+            AssignmentNode(
                     LHSNode("out"),
                     RHSNode("out", false, null, null)
-            )
-    )
-    val nandPartNode = PartNode(nandNode, nandAssignments)
+            ))
+    val nandPartNode = PartNode(nandNode, nandInputAssignments, nandOutputAssignments)
 
     val orIns = listOf(
             IONode("a", 1),
@@ -174,16 +174,17 @@ val NOT16_CHIP = {
             IONode("out", 16)
     )
     val not16Parts = (0..15).map {
-        val notAssignments = listOf(
-                InputAssignmentNode(
+        val notInputAssignments = listOf(
+                AssignmentNode(
                         LHSNode("in"),
                         RHSNode("in", true, it, it)
-                ),
-                OutputAssignmentNode(
+                ))
+        val notOutputAssignments = listOf(
+                AssignmentNode(
                         LHSNode("out"),
                         RHSNode("out", true, it, it)
                 ))
-        PartNode(NOT_CHIP, notAssignments)
+        PartNode(NOT_CHIP, notInputAssignments, notOutputAssignments)
     }
     val not16Node = ChipNode("Not16", not16Ins, not16Outs, not16Parts)
 
