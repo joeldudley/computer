@@ -6,19 +6,16 @@ import hardwaresimulator.internal.*
 // TODO: Need to use handle indexes in square brackets.
 class GeneratorImpl : Generator {
     override fun generateChip(chipNode: ChipNode): Chip {
-        val inputGateNames = chipNode.inputs.map { it.name }
-        val inputGateMap = inputGateNames.map { name -> name to PassthroughGate() }.toMap()
+        val inputGateMap = chipNode.inputs.map { assignment -> assignment.name to PassthroughGate() }.toMap()
         val parts = generateParts(chipNode)
 
-        val allRHSGates = mutableMapOf<String, Gate>()
-        parts.forEach { part ->
+        val allRHSGates = parts.flatMap { part ->
             part.outputs.map { output ->
                 val key = output.rhs.name
                 val value = part.chip.outputGateMap[output.lhs.name]!!
-                allRHSGates.put(key, value)
+                key to value
             }
-        }
-        allRHSGates.putAll(inputGateMap)
+        }.toMap() + inputGateMap
 
         parts.forEach { part -> hookUpPart(part, allRHSGates) }
 
