@@ -103,6 +103,11 @@ class IntegrationTests {
     fun dffTest() {
         simulator.loadChip("DFF")
 
+        // TODO: Annoying set-up code. We need a way to initialise this properly,
+        // TODO: or treat the clock input specially.
+        simulator.setInputs("data" to false, "clock" to true)
+        simulator.setInputs("data" to false, "clock" to false)
+
         simulator.setInputs("data" to false, "clock" to false)
         assertEquals(false, simulator.getOutput("out"))
 
