@@ -9,7 +9,7 @@ class GeneratorImpl : Generator {
         val inputGateMap = generateInputGateMap(chipNode)
 
         val partsAndAssignments = generatePartsAndSplitAssignments(chipNode)
-        val partVariableGateMap = extractVariableGateMap(partsAndAssignments)
+        val partVariableGateMap = generateVariableGateMap(partsAndAssignments)
 
         val rhsGateMap = inputGateMap + partVariableGateMap
 
@@ -35,11 +35,11 @@ class GeneratorImpl : Generator {
             val outputAssignments: List<AssignmentNode>)
 
     private fun generatePartsAndSplitAssignments(chipNode: ChipNode): List<PartAndAssignments> {
-        return chipNode.parts.map { part ->
-            val partChip = generatePart(part)
-            val partAssignments = part.assignments
-            val (inputAssignments, outputAssignments) = splitInputAndOutputAssignments(partChip, partAssignments)
-            PartAndAssignments(partChip, inputAssignments, outputAssignments)
+        return chipNode.parts.map { partNode ->
+            val part = generatePart(partNode)
+            val partAssignments = partNode.assignments
+            val (inputAssignments, outputAssignments) = splitInputAndOutputAssignments(part, partAssignments)
+            PartAndAssignments(part, inputAssignments, outputAssignments)
         }
     }
 
@@ -65,14 +65,18 @@ class GeneratorImpl : Generator {
         return inputAssignments to outputAssignments
     }
 
-    private fun extractVariableGateMap(partChipsAndAssignments: List<PartAndAssignments>): Map<String, Gate> {
-        return partChipsAndAssignments.flatMap { part ->
-            part.outputAssignments.map { output ->
+    private fun generateVariableGateMap(partsAndAssignments: List<PartAndAssignments>): Map<String, Gate> {
+        val variableGateMap = mutableMapOf<String, Gate>()
+
+        for ((part, _, outputAssignments) in partsAndAssignments) {
+            outputAssignments.forEach { output ->
                 val key = output.rhs.name
-                val value = part.chip.outputGateMap[output.lhs.name]!!
-                key to value
+                val value = part.outputGateMap[output.lhs.name]!!
+                variableGateMap.put(key, value)
             }
-        }.toMap()
+        }
+
+        return variableGateMap
     }
 
     private fun hookUpPart(part: PartAndAssignments, allRHSGates: Map<String, Gate>) {
