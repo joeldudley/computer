@@ -9,8 +9,8 @@ import hardwaresimulator.internal.tokeniser.TokenizerImpl
 import java.io.File
 
 // Maps input and output gate names to input and output gates for a chip.
-data class Chip(val inputGateMap: Map<String, Gate>, val outputGateMap: Map<String, Gate>)
-data class ChipInput(val name: String, val value: Boolean)
+data class Chip(val inputGateMap: Map<String, List<Gate>>, val outputGateMap: Map<String, List<Gate>>)
+data class ChipInput(val name: String, val index: Int, val value: Boolean)
 
 /**
  * Loads chips into memory, simulates running them, and reads back the results.
@@ -38,12 +38,16 @@ class HardwareSimulatorImpl : HardwareSimulator {
         evaluator.loadChip(chip)
     }
 
-    override fun setInputs(vararg inputValues: Pair<String, Boolean>) {
-        val chipInputs = inputValues.map { (name, value) -> ChipInput(name, value) }
+    override fun setInputs(vararg inputValues: Pair<String, List<Boolean>>) {
+        val chipInputs = inputValues.flatMap {
+            it.second.withIndex().map { (idx, value) ->
+                ChipInput(it.first, idx, value)
+            }
+        }
         evaluator.setInputs(chipInputs)
     }
 
-    override fun getOutput(gateName: String): Boolean {
+    override fun getOutput(gateName: String): List<Boolean> {
         return evaluator.getValue(gateName)
     }
 

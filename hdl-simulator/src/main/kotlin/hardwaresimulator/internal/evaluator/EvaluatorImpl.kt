@@ -6,7 +6,7 @@ import hardwaresimulator.internal.Gate
 
 private val LOOPS_TO_INITIALISE = 3
 
-internal class EvaluatorImpl: Evaluator {
+internal class EvaluatorImpl : Evaluator {
     // The chip currently being simulated.
     private var loadedChip: Chip? = null
 
@@ -24,9 +24,10 @@ internal class EvaluatorImpl: Evaluator {
 
         inputValues.forEach { inputValue ->
             val inputGate = inputGateMap[inputValue.name] ?: throw IllegalArgumentException("Unknown input gate.")
-            if (inputGate.value != inputValue.value) {
-                inputGate.value = inputValue.value
-                gatesToUpdate.addAll(inputGate.outputs)
+            val pin = inputGate[inputValue.index]
+            if (pin.value != inputValue.value) {
+                pin.value = inputValue.value
+                gatesToUpdate.addAll(pin.outputs)
             }
         }
 
@@ -45,33 +46,33 @@ internal class EvaluatorImpl: Evaluator {
         }
     }
 
-    override fun getValue(gateName: String): Boolean {
+    override fun getValue(gateName: String): List<Boolean> {
         val outputGateMap = loadedChip?.outputGateMap ?: throw IllegalStateException("No chip loaded in the simulator.")
         val outputGate = outputGateMap[gateName] ?: throw IllegalArgumentException("Unknown output gate.")
-        return outputGate.value
+        return outputGate.map { it.value }
     }
 
     private fun initialiseChip() {
         val inputGateMap = loadedChip?.inputGateMap ?: throw IllegalStateException("No chip loaded in the simulator.")
         val inputGates = inputGateMap.values
-        inputGates.forEach { gate ->
-            gate.value = false
+        inputGates.flatten().forEach { pin ->
+            pin.value = false
         }
 
         repeat(LOOPS_TO_INITIALISE) {
-            val gatesToUpdate = mutableListOf<Gate>()
-            inputGates.forEach { gate ->
-                gatesToUpdate.addAll(gate.outputs)
+            val pinsToUpdate = mutableListOf<Gate>()
+            inputGates.flatten().forEach { pin ->
+                pinsToUpdate.addAll(pin.outputs)
             }
 
             var i = 0
-            while (i < gatesToUpdate.size) {
-                val gateToUpdate = gatesToUpdate[i]
+            while (i < pinsToUpdate.size) {
+                val gateToUpdate = pinsToUpdate[i]
                 val newValue = gateToUpdate.calculateNewValue()
                 gateToUpdate.value = newValue
                 gateToUpdate.outputs.forEach { newOutput ->
-                    if (newOutput !in gatesToUpdate) {
-                        gatesToUpdate.add(newOutput)
+                    if (newOutput !in pinsToUpdate) {
+                        pinsToUpdate.add(newOutput)
                     }
                 }
                 i++

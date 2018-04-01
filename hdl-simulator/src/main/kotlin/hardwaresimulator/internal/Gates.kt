@@ -1,5 +1,6 @@
 package hardwaresimulator.internal
 
+// TODO: Rename to pin.
 // A logic gate.
 sealed class Gate {
     var in1: Gate? = null
