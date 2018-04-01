@@ -6,18 +6,18 @@ import hardwaresimulator.internal.*
 // TODO: Need to use handle indexes in square brackets.
 class GeneratorImpl : Generator {
     override fun generateChip(chipNode: ChipNode): Chip {
-        val inputGateMap = generateInputGateMap(chipNode)
+        val partsAndAssignments = generateParts(chipNode)
 
-        val partsAndAssignments = generatePartsAndSplitAssignments(chipNode)
-        val partVariableGateMap = generateVariableGateMap(partsAndAssignments)
+        val inputGates = generateInputGateMap(chipNode)
+        val partOutputGates = extractPartOutputGates(partsAndAssignments)
+        val inputAssignmentGates = inputGates + partOutputGates
 
-        val rhsGateMap = inputGateMap + partVariableGateMap
-
-        hookUpParts(partsAndAssignments, rhsGateMap)
+        hookUpParts(partsAndAssignments, inputAssignmentGates)
 
         val chipOutputNames = chipNode.outputs.map { outputNode -> outputNode.name }
-        val outputGateMap = chipOutputNames.map { outputName -> outputName to rhsGateMap[outputName]!! }.toMap()
-        return Chip(inputGateMap, outputGateMap)
+        val outputGates = chipOutputNames.map { outputName -> outputName to inputAssignmentGates[outputName]!! }.toMap()
+
+        return Chip(inputGates, outputGates)
     }
 
     private fun generateInputGateMap(chipNode: ChipNode): Map<String, Gate> {
@@ -25,16 +25,12 @@ class GeneratorImpl : Generator {
         return inputNames.map { inputName -> inputName to PassthroughGate() }.toMap()
     }
 
-    private fun hookUpParts(partsAndAssignments: List<PartAndAssignments>, rhsGateMap: Map<String, Gate>) {
-        partsAndAssignments.forEach { part -> hookUpPart(part, rhsGateMap) }
-    }
-
     private data class PartAndAssignments(
             val chip: Chip,
             val inputAssignments: List<AssignmentNode>,
             val outputAssignments: List<AssignmentNode>)
 
-    private fun generatePartsAndSplitAssignments(chipNode: ChipNode): List<PartAndAssignments> {
+    private fun generateParts(chipNode: ChipNode): List<PartAndAssignments> {
         return chipNode.parts.map { partNode ->
             val part = generatePart(partNode)
             PartAndAssignments(part, partNode.inputAssignments, partNode.outputAssignments)
@@ -49,23 +45,22 @@ class GeneratorImpl : Generator {
         }
     }
 
-    private fun generateVariableGateMap(partsAndAssignments: List<PartAndAssignments>): Map<String, Gate> {
-        val variableGateMap = mutableMapOf<String, Gate>()
-
-        for ((part, _, outputAssignments) in partsAndAssignments) {
-            outputAssignments.forEach { output ->
-                val key = output.rhs.name
-                val value = part.outputGateMap[output.lhs.name]!!
-                variableGateMap.put(key, value)
+    private fun extractPartOutputGates(partsAndAssignments: List<PartAndAssignments>): Map<String, Gate> {
+        return partsAndAssignments.flatMap { partAndAssignments ->
+            partAndAssignments.outputAssignments.map { outputAssignment ->
+                val gate = partAndAssignments.chip.outputGateMap[outputAssignment.lhs.name]!!
+                outputAssignment.rhs.name to gate
             }
-        }
-
-        return variableGateMap
+        }.toMap()
     }
 
-    private fun hookUpPart(part: PartAndAssignments, allRHSGates: Map<String, Gate>) {
+    private fun hookUpParts(partsAndAssignments: List<PartAndAssignments>, rhsGateMap: Map<String, Gate>) {
+        partsAndAssignments.forEach { part -> hookUpPart(part, rhsGateMap) }
+    }
+
+    private fun hookUpPart(part: PartAndAssignments, inputAssignmentGates: Map<String, Gate>) {
         part.inputAssignments.forEach { assignment ->
-            val rhsGate = allRHSGates[assignment.rhs.name]
+            val rhsGate = inputAssignmentGates[assignment.rhs.name]
                     ?: throw IllegalArgumentException("Assignment RHS not found in chip's input, output or internal gates.")
 
             val lhsGate = part.chip.inputGateMap[assignment.lhs.name]

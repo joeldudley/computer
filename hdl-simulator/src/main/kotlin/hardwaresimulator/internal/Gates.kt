@@ -18,7 +18,7 @@ class PassthroughGate : Gate() {
 }
 
 // A logic gate with two input pin and a single output pin.
-// value = in1.value nand in2.value
+// value = in1.value and in2.value
 class NandGate : Gate() {
     var in2: Gate? = null
 
