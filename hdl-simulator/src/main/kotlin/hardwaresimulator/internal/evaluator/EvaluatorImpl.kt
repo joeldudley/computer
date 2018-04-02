@@ -24,9 +24,10 @@ internal class EvaluatorImpl: Evaluator {
 
         inputValues.forEach { inputValue ->
             val inputGate = inputGateMap[inputValue.name] ?: throw IllegalArgumentException("Unknown input gate.")
-            if (inputGate.value != inputValue.value) {
-                inputGate.value = inputValue.value
-                gatesToUpdate.addAll(inputGate.outputs)
+            // TODO: Don't use single() - index properly to handle wide chips.
+            if (inputGate.single().value != inputValue.value) {
+                inputGate.single().value = inputValue.value
+                gatesToUpdate.addAll(inputGate.single().outputs)
             }
         }
 
@@ -48,20 +49,23 @@ internal class EvaluatorImpl: Evaluator {
     override fun getValue(gateName: String): Boolean {
         val outputGateMap = loadedChip?.outputGateMap ?: throw IllegalStateException("No chip loaded in the simulator.")
         val outputGate = outputGateMap[gateName] ?: throw IllegalArgumentException("Unknown output gate.")
-        return outputGate.value
+        // TODO: Don't use single() - index properly to handle wide chips.
+        return outputGate.single().value
     }
 
     private fun initialiseChip() {
         val inputGateMap = loadedChip?.inputGateMap ?: throw IllegalStateException("No chip loaded in the simulator.")
         val inputGates = inputGateMap.values
         inputGates.forEach { gate ->
-            gate.value = false
+            // TODO: Don't use single() - index properly to handle wide chips.
+            gate.single().value = false
         }
 
         repeat(LOOPS_TO_INITIALISE) {
             val gatesToUpdate = mutableListOf<Gate>()
             inputGates.forEach { gate ->
-                gatesToUpdate.addAll(gate.outputs)
+                // TODO: Don't use single() - index properly to handle wide chips.
+                gatesToUpdate.addAll(gate.single().outputs)
             }
 
             var i = 0

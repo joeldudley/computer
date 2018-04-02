@@ -20,9 +20,9 @@ class GeneratorImpl : Generator {
         return Chip(inputGates, outputGates)
     }
 
-    private fun generateInputGateMap(chipNode: ChipNode): Map<String, Gate> {
+    private fun generateInputGateMap(chipNode: ChipNode): Map<String, List<Gate>> {
         val inputNames = chipNode.inputs.map { inputNode -> inputNode.name }
-        return inputNames.map { inputName -> inputName to PassthroughGate() }.toMap()
+        return inputNames.map { inputName -> inputName to listOf(PassthroughGate()) }.toMap()
     }
 
     private data class PartAndAssignments(
@@ -45,7 +45,7 @@ class GeneratorImpl : Generator {
         }
     }
 
-    private fun extractPartOutputGates(partsAndAssignments: List<PartAndAssignments>): Map<String, Gate> {
+    private fun extractPartOutputGates(partsAndAssignments: List<PartAndAssignments>): Map<String, List<Gate>> {
         return partsAndAssignments.flatMap { partAndAssignments ->
             partAndAssignments.outputAssignments.map { outputAssignment ->
                 val gate = partAndAssignments.chip.outputGateMap[outputAssignment.lhs.name]!!
@@ -54,11 +54,11 @@ class GeneratorImpl : Generator {
         }.toMap()
     }
 
-    private fun hookUpParts(partsAndAssignments: List<PartAndAssignments>, rhsGateMap: Map<String, Gate>) {
+    private fun hookUpParts(partsAndAssignments: List<PartAndAssignments>, rhsGateMap: Map<String, List<Gate>>) {
         partsAndAssignments.forEach { part -> hookUpPart(part, rhsGateMap) }
     }
 
-    private fun hookUpPart(part: PartAndAssignments, inputAssignmentGates: Map<String, Gate>) {
+    private fun hookUpPart(part: PartAndAssignments, inputAssignmentGates: Map<String, List<Gate>>) {
         part.inputAssignments.forEach { assignment ->
             val rhsGate = inputAssignmentGates[assignment.rhs.name]
                     ?: throw IllegalArgumentException("Assignment RHS not found in chip's input, output or internal gates.")
@@ -66,8 +66,9 @@ class GeneratorImpl : Generator {
             val lhsGate = part.chip.inputGateMap[assignment.lhs.name]
                     ?: throw IllegalArgumentException("LHS is not input of part.")
 
-            lhsGate.in1 = rhsGate
-            rhsGate.outputs.add(lhsGate)
+            // TODO: Don't use single() - index properly to handle wide chips.
+            lhsGate.single().in1 = rhsGate.single()
+            rhsGate.single().outputs.add(lhsGate.single())
         }
     }
 
@@ -82,8 +83,8 @@ class GeneratorImpl : Generator {
         nandGate.in2 = in2
         in2.outputs.add(nandGate)
 
-        val inputGateMap = mapOf("a" to in1, "b" to in2)
-        val outputGateMap = mapOf("out" to nandGate)
+        val inputGateMap = mapOf("a" to listOf(in1), "b" to listOf(in2))
+        val outputGateMap = mapOf("out" to listOf(nandGate))
         return Chip(inputGateMap, outputGateMap)
     }
 }

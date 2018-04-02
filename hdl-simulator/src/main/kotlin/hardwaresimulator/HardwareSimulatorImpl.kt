@@ -9,7 +9,7 @@ import hardwaresimulator.internal.tokeniser.TokenizerImpl
 import java.io.File
 
 // Maps input and output gate names to input and output gates for a chip.
-data class Chip(val inputGateMap: Map<String, Gate>, val outputGateMap: Map<String, Gate>)
+data class Chip(val inputGateMap: Map<String, List<Gate>>, val outputGateMap: Map<String, List<Gate>>)
 data class ChipInput(val name: String, val value: Boolean)
 
 /**
