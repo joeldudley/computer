@@ -15,128 +15,168 @@ class IntegrationTests {
 
     // Test of a small, non-recursive gate (1/3).
     @Test
-    fun notTest() {
-        simulator.loadChip("Not")
+    fun notTest() = with(simulator) {
+        loadChip("Not")
 
-        simulator.setInputs("in" to false)
-        assertEquals(true, simulator.getOutput("out"))
+        setInput("in", listOf(false))
+        assertEquals(listOf(true), getOutput("out"))
 
-        simulator.setInputs("in" to true)
-        assertEquals(false, simulator.getOutput("out"))
+        setInput("in", listOf(true))
+        assertEquals(listOf(false), getOutput("out"))
 
-        simulator.setInputs("in" to false)
-        assertEquals(true, simulator.getOutput("out"))
+        setInput("in", listOf(false))
+        assertEquals(listOf(true), getOutput("out"))
 
-        simulator.setInputs("in" to true)
-        assertEquals(false, simulator.getOutput("out"))
+        setInput("in", listOf(true))
+        assertEquals(listOf(false), getOutput("out"))
     }
 
     // Test of a small, non-recursive gate (2/3).
     @Test
-    fun andTest() {
-        simulator.loadChip("And")
+    fun andTest() = with(simulator) {
+        loadChip("And")
 
-        simulator.setInputs("a" to false, "b" to false)
-        assertEquals(false, simulator.getOutput("out"))
+        setInput("a", listOf(false))
+        setInput("b", listOf(false))
+        assertEquals(listOf(false), getOutput("out"))
 
-        simulator.setInputs("a" to false, "b" to true)
-        assertEquals(false, simulator.getOutput("out"))
+        setInput("a", listOf(false))
+        setInput("b", listOf(true))
+        assertEquals(listOf(false), getOutput("out"))
 
-        simulator.setInputs("a" to true, "b" to false)
-        assertEquals(false, simulator.getOutput("out"))
+        setInput("a", listOf(true))
+        setInput("b", listOf(false))
+        assertEquals(listOf(false), getOutput("out"))
 
-        simulator.setInputs("a" to true, "b" to true)
-        assertEquals(true, simulator.getOutput("out"))
+        setInput("a", listOf(true))
+        setInput("b", listOf(true))
+        assertEquals(listOf(true), getOutput("out"))
     }
 
     // Test of a small, non-recursive gate (3/3).
     @Test
-    fun orTest() {
-        simulator.loadChip("Or")
+    fun orTest() = with(simulator) {
+        loadChip("Or")
 
-        simulator.setInputs("a" to false, "b" to false)
-        assertEquals(false, simulator.getOutput("out"))
+        setInput("a", listOf(false))
+        setInput("b", listOf(false))
+        assertEquals(listOf(false), getOutput("out"))
 
-        simulator.setInputs("a" to false, "b" to true)
-        assertEquals(true, simulator.getOutput("out"))
+        setInput("a", listOf(false))
+        setInput("b", listOf(true))
+        assertEquals(listOf(true), getOutput("out"))
 
-        simulator.setInputs("a" to true, "b" to false)
-        assertEquals(true, simulator.getOutput("out"))
+        setInput("a", listOf(true))
+        setInput("b", listOf(false))
+        assertEquals(listOf(true), getOutput("out"))
 
-        simulator.setInputs("a" to true, "b" to true)
-        assertEquals(true, simulator.getOutput("out"))
+        setInput("a", listOf(true))
+        setInput("b", listOf(true))
+        assertEquals(listOf(true), getOutput("out"))
     }
 
     // Test of the 3-way nand gate.
-    // It's part of the DFF, and no solution is provided as part of Nand2Tetris.
+// It's part of the DFF, and no solution is provided as part of Nand2Tetris.
     @Test
-    fun nand3WayTest() {
-        simulator.loadChip("Nand3Way")
+    fun nand3WayTest() = with(simulator) {
+        loadChip("Nand3Way")
 
-        simulator.setInputs("a" to false, "b" to false, "c" to false)
-        assertEquals(true, simulator.getOutput("out"))
+        setInput("a", listOf(false))
+        setInput("b", listOf(false))
+        setInput("c", listOf(false))
+        assertEquals(listOf(true), getOutput("out"))
 
-        simulator.setInputs("a" to false, "b" to false, "c" to true)
-        assertEquals(true, simulator.getOutput("out"))
+        setInput("a", listOf(false))
+        setInput("b", listOf(false))
+        setInput("c", listOf(true))
+        assertEquals(listOf(true), getOutput("out"))
 
-        simulator.setInputs("a" to false, "b" to true, "c" to false)
-        assertEquals(true, simulator.getOutput("out"))
+        setInput("a", listOf(false))
+        setInput("b", listOf(true))
+        setInput("c", listOf(false))
+        assertEquals(listOf(true), getOutput("out"))
 
-        simulator.setInputs("a" to false, "b" to true, "c" to true)
-        assertEquals(true, simulator.getOutput("out"))
+        setInput("a", listOf(false))
+        setInput("b", listOf(true))
+        setInput("c", listOf(true))
+        assertEquals(listOf(true), getOutput("out"))
 
-        simulator.setInputs("a" to true, "b" to false, "c" to false)
-        assertEquals(true, simulator.getOutput("out"))
+        setInput("a", listOf(true))
+        setInput("b", listOf(false))
+        setInput("c", listOf(false))
+        assertEquals(listOf(true), getOutput("out"))
 
-        simulator.setInputs("a" to true, "b" to false, "c" to true)
-        assertEquals(true, simulator.getOutput("out"))
+        setInput("a", listOf(true))
+        setInput("b", listOf(false))
+        setInput("c", listOf(true))
+        assertEquals(listOf(true), getOutput("out"))
 
-        simulator.setInputs("a" to true, "b" to true, "c" to false)
-        assertEquals(true, simulator.getOutput("out"))
+        setInput("a", listOf(true))
+        setInput("b", listOf(true))
+        setInput("c", listOf(false))
+        assertEquals(listOf(true), getOutput("out"))
 
-        simulator.setInputs("a" to true, "b" to true, "c" to true)
-        assertEquals(false, simulator.getOutput("out"))
+        setInput("a", listOf(true))
+        setInput("b", listOf(true))
+        setInput("c", listOf(true))
+        assertEquals(listOf(false), getOutput("out"))
     }
 
     // Test of a small recursive gate.
     @Test
-    fun dffTest() {
-        simulator.loadChip("DFF")
+    fun dffTest() = with(simulator) {
+        loadChip("DFF")
 
         // TODO: Annoying set-up code. We need a way to initialise this properly,
         // TODO: or treat the clock input specially.
-        simulator.setInputs("data" to false, "clock" to true)
-        simulator.setInputs("data" to false, "clock" to false)
+        setInput("data", listOf(false))
+        setInput("clock", listOf(true))
 
-        simulator.setInputs("data" to false, "clock" to false)
-        assertEquals(false, simulator.getOutput("out"))
+        setInput("data", listOf(false))
+        setInput("clock", listOf(false))
+
+        setInput("data", listOf(false))
+        setInput("clock", listOf(false))
+        assertEquals(listOf(false), getOutput("out"))
 
         // Output is locked while clock is tocked.
-        simulator.setInputs("data" to true, "clock" to false)
-        assertEquals(false, simulator.getOutput("out"))
+        setInput("data", listOf(true))
+        setInput("clock", listOf(false))
+        assertEquals(listOf(false), getOutput("out"))
 
         // Output updates when clock ticks.
-        simulator.setInputs("data" to true, "clock" to true)
-        assertEquals(true, simulator.getOutput("out"))
+        setInput("data", listOf(true))
+        setInput("clock", listOf(true))
+        assertEquals(listOf(true), getOutput("out"))
 
         // Output is locked while clock is ticked.
-        simulator.setInputs("data" to false, "clock" to true)
-        assertEquals(true, simulator.getOutput("out"))
+        setInput("data", listOf(false))
+        setInput("clock", listOf(true))
+        assertEquals(listOf(true), getOutput("out"))
 
         // Output doesn't update when clock tocks.
-        simulator.setInputs("data" to false, "clock" to false)
-        assertEquals(true, simulator.getOutput("out"))
+        setInput("data", listOf(false))
+        setInput("clock", listOf(false))
+        assertEquals(listOf(true), getOutput("out"))
 
         // Output updates when clock ticks.
-        simulator.setInputs("data" to false, "clock" to true)
-        assertEquals(false, simulator.getOutput("out"))
+        setInput("data", listOf(false))
+        setInput("clock", listOf(true))
+        assertEquals(listOf(false), getOutput("out"))
     }
 
-    // TODO: Make this pass.
     // Test of a gate with wide inputs and outputs.
     @Test
-    fun not16Test() {
-        simulator.loadChip("Not16")
-        // TODO: Write test cases. Need to find a way to pass in wide inputs/outputs.
+    fun not16Test() = with(simulator) {
+        loadChip("Not16")
+
+        setInput("in", (0..15).map { false })
+        assertEquals((0..15).map { true }, getOutput("out"))
+
+        setInput("in", (0..15).map { true })
+        assertEquals((0..15).map { false }, getOutput("out"))
+
+        setInput("in", (0..7).flatMap { listOf(true, false) })
+        assertEquals((0..7).flatMap { listOf(false, true) }, getOutput("out"))
     }
 }

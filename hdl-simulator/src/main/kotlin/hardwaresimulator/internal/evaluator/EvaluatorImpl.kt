@@ -6,7 +6,7 @@ import hardwaresimulator.internal.Gate
 
 private val LOOPS_TO_INITIALISE = 3
 
-internal class EvaluatorImpl: Evaluator {
+internal class EvaluatorImpl : Evaluator {
     // The chip currently being simulated.
     private var loadedChip: Chip? = null
 
@@ -15,19 +15,19 @@ internal class EvaluatorImpl: Evaluator {
         initialiseChip()
     }
 
-    override fun setInputs(inputValues: List<ChipInput>) {
+    override fun setInput(name: String, values: List<Boolean>) {
         val inputGateMap = loadedChip?.inputGateMap ?: throw IllegalStateException("No chip loaded in the simulator.")
 
         // For each input gate, if its new value is different to its existing
         // value, we set its value and get its downstream output gates.
         val gatesToUpdate = mutableListOf<Gate>()
 
-        inputValues.forEach { inputValue ->
-            val inputGate = inputGateMap[inputValue.name] ?: throw IllegalArgumentException("Unknown input gate.")
-            // TODO: Don't use single() - index properly to handle wide chips.
-            if (inputGate.single().value != inputValue.value) {
-                inputGate.single().value = inputValue.value
-                gatesToUpdate.addAll(inputGate.single().outputs)
+        val inputPins = inputGateMap[name] ?: throw IllegalArgumentException("Unknown input gate.")
+
+        for ((pin, value) in inputPins.zip(values)) {
+            if (pin.value != value) {
+                pin.value = value
+                gatesToUpdate.addAll(pin.outputs)
             }
         }
 
@@ -46,36 +46,35 @@ internal class EvaluatorImpl: Evaluator {
         }
     }
 
-    override fun getValue(gateName: String): Boolean {
+    override fun getValue(gateName: String): List<Boolean> {
         val outputGateMap = loadedChip?.outputGateMap ?: throw IllegalStateException("No chip loaded in the simulator.")
         val outputGate = outputGateMap[gateName] ?: throw IllegalArgumentException("Unknown output gate.")
-        // TODO: Don't use single() - index properly to handle wide chips.
-        return outputGate.single().value
+        return outputGate.map {
+            it.value
+        }
     }
 
     private fun initialiseChip() {
         val inputGateMap = loadedChip?.inputGateMap ?: throw IllegalStateException("No chip loaded in the simulator.")
-        val inputGates = inputGateMap.values
-        inputGates.forEach { gate ->
-            // TODO: Don't use single() - index properly to handle wide chips.
-            gate.single().value = false
+        val allInputPins = inputGateMap.values.flatten()
+        allInputPins.forEach { pin ->
+            pin.value = false
         }
 
         repeat(LOOPS_TO_INITIALISE) {
-            val gatesToUpdate = mutableListOf<Gate>()
-            inputGates.forEach { gate ->
-                // TODO: Don't use single() - index properly to handle wide chips.
-                gatesToUpdate.addAll(gate.single().outputs)
+            val pinsToUpdate = mutableListOf<Gate>()
+            allInputPins.forEach { pin ->
+                pinsToUpdate.addAll(pin.outputs)
             }
 
             var i = 0
-            while (i < gatesToUpdate.size) {
-                val gateToUpdate = gatesToUpdate[i]
+            while (i < pinsToUpdate.size) {
+                val gateToUpdate = pinsToUpdate[i]
                 val newValue = gateToUpdate.calculateNewValue()
                 gateToUpdate.value = newValue
                 gateToUpdate.outputs.forEach { newOutput ->
-                    if (newOutput !in gatesToUpdate) {
-                        gatesToUpdate.add(newOutput)
+                    if (newOutput !in pinsToUpdate) {
+                        pinsToUpdate.add(newOutput)
                     }
                 }
                 i++

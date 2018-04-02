@@ -6,23 +6,34 @@ import hardwaresimulator.internal.*
 // TODO: Need to use handle indexes in square brackets.
 class GeneratorImpl : Generator {
     override fun generateChip(chipNode: ChipNode): Chip {
-        val partsAndAssignments = generateParts(chipNode)
+        val chipPartsAndAssignments = generateChipPartsAndGatherPartAssignments(chipNode)
 
-        val inputGates = generateInputGateMap(chipNode)
-        val partOutputGates = extractPartOutputGates(partsAndAssignments)
-        val inputAssignmentGates = inputGates + partOutputGates
+        val chipInputGates = generateChipInputGateMap(chipNode)
+        val chipOutputGates = generateChipOutputGateMap(chipNode)
+        val outputGatesInParts = extractPartOutputGates(chipOutputGates, chipPartsAndAssignments)
+        val inputAssignmentGates = chipInputGates + outputGatesInParts
 
-        hookUpParts(partsAndAssignments, inputAssignmentGates)
+        hookUpParts(chipPartsAndAssignments, inputAssignmentGates)
 
-        val chipOutputNames = chipNode.outputs.map { outputNode -> outputNode.name }
-        val outputGates = chipOutputNames.map { outputName -> outputName to inputAssignmentGates[outputName]!! }.toMap()
-
-        return Chip(inputGates, outputGates)
+        // TODO: Remove this ugly cast.
+        return Chip(chipInputGates, chipOutputGates as Map<String, List<Gate>>)
     }
 
-    private fun generateInputGateMap(chipNode: ChipNode): Map<String, List<Gate>> {
-        val inputNames = chipNode.inputs.map { inputNode -> inputNode.name }
-        return inputNames.map { inputName -> inputName to listOf(PassthroughGate()) }.toMap()
+    private fun generateChipInputGateMap(chipNode: ChipNode): Map<String, List<Gate>> {
+        return chipNode.inputs.map { input ->
+            val inputGates = (0 until input.width).map { PassthroughGate() }
+            input.name to inputGates
+        }.toMap()
+    }
+
+    private fun generateChipOutputGateMap(chipNode: ChipNode): Map<String, MutableList<Gate?>> {
+        return chipNode.outputs.map { output ->
+            // The pins in the output gates are set to null initially.
+            // They will be set to actual gates when walking through the
+            // outputs of the chip's parts.
+            val outputGates: MutableList<Gate?> = (0 until output.width).map { null }.toMutableList()
+            output.name to outputGates
+        }.toMap()
     }
 
     private data class PartAndAssignments(
@@ -30,7 +41,7 @@ class GeneratorImpl : Generator {
             val inputAssignments: List<AssignmentNode>,
             val outputAssignments: List<AssignmentNode>)
 
-    private fun generateParts(chipNode: ChipNode): List<PartAndAssignments> {
+    private fun generateChipPartsAndGatherPartAssignments(chipNode: ChipNode): List<PartAndAssignments> {
         return chipNode.parts.map { partNode ->
             val part = generatePart(partNode)
             PartAndAssignments(part, partNode.inputAssignments, partNode.outputAssignments)
@@ -45,13 +56,34 @@ class GeneratorImpl : Generator {
         }
     }
 
-    private fun extractPartOutputGates(partsAndAssignments: List<PartAndAssignments>): Map<String, List<Gate>> {
-        return partsAndAssignments.flatMap { partAndAssignments ->
-            partAndAssignments.outputAssignments.map { outputAssignment ->
+    private fun extractPartOutputGates(chipOutputGates: Map<String, MutableList<Gate?>>, partsAndAssignments: List<PartAndAssignments>): Map<String, List<Gate>> {
+        val outputGatesInParts = mutableMapOf<String, List<Gate>>()
+
+        partsAndAssignments.forEach { partAndAssignments ->
+            partAndAssignments.outputAssignments.forEach { outputAssignment ->
                 val gate = partAndAssignments.chip.outputGateMap[outputAssignment.lhs.name]!!
-                outputAssignment.rhs.name to gate
+
+                // If the rhs is indexed, modify the existing pin list in the gate map.
+                if (outputAssignment.rhs.name in chipOutputGates) {
+
+                    val outputGateToUpdate = chipOutputGates[outputAssignment.rhs.name]!!
+
+                    // TODO: Handle elipsis in the indexing.
+                    // TODO: Handle cases where there isn't a single pin in the lhs gate.
+                    if (outputAssignment.rhs.indexed) {
+                        outputGateToUpdate[outputAssignment.rhs.startIndex!!] = gate.single()
+                    } else {
+                        outputGateToUpdate[0] = gate.single()
+                    }
+                }
+
+                else {
+                    outputGatesInParts.put(outputAssignment.rhs.name, gate)
+                }
             }
-        }.toMap()
+        }
+
+        return outputGatesInParts
     }
 
     private fun hookUpParts(partsAndAssignments: List<PartAndAssignments>, rhsGateMap: Map<String, List<Gate>>) {
@@ -60,15 +92,27 @@ class GeneratorImpl : Generator {
 
     private fun hookUpPart(part: PartAndAssignments, inputAssignmentGates: Map<String, List<Gate>>) {
         part.inputAssignments.forEach { assignment ->
-            val rhsGate = inputAssignmentGates[assignment.rhs.name]
-                    ?: throw IllegalArgumentException("Assignment RHS not found in chip's input, output or internal gates.")
-
-            val lhsGate = part.chip.inputGateMap[assignment.lhs.name]
+            val lhsGates = part.chip.inputGateMap[assignment.lhs.name]
                     ?: throw IllegalArgumentException("LHS is not input of part.")
 
-            // TODO: Don't use single() - index properly to handle wide chips.
-            lhsGate.single().in1 = rhsGate.single()
-            rhsGate.single().outputs.add(lhsGate.single())
+            val allRHSGates = inputAssignmentGates[assignment.rhs.name]
+                    ?: throw IllegalArgumentException("Assignment RHS not found in chip's input, output or internal gates.")
+
+            // TODO: Check if I'm doing the indexing right.
+            val actualGates = if (assignment.rhs.startIndex == null && assignment.rhs.endIndex == null) {
+                allRHSGates
+            } else if (assignment.rhs.startIndex != null && assignment.rhs.endIndex == null) {
+                allRHSGates.subList(assignment.rhs.startIndex, assignment.rhs.startIndex + 1)
+            } else if (assignment.rhs.startIndex != null && assignment.rhs.endIndex != null) {
+                allRHSGates.subList(assignment.rhs.startIndex, assignment.rhs.endIndex + 1)
+            } else {
+                throw IllegalArgumentException("Start index not specified but end index specified.")
+            }
+
+            for ((lhsGate, rhsGate) in lhsGates.zip(actualGates)) {
+                lhsGate.in1 = rhsGate
+                rhsGate.outputs.add(lhsGate)
+            }
         }
     }
 
