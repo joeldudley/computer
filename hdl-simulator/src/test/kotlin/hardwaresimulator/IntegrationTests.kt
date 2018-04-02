@@ -13,7 +13,7 @@ class IntegrationTests {
         simulator.loadChipDefinitions("src/test/resources")
     }
 
-    // Test of a small, non-recursive gate (1/3).
+    // Test of a simple non-recursive gate (1/3).
     @Test
     fun notTest() = with(simulator) {
         loadChip("Not")
@@ -31,7 +31,7 @@ class IntegrationTests {
         assertEquals(listOf(false), getOutput("out"))
     }
 
-    // Test of a small, non-recursive gate (2/3).
+    // Test of a simple non-recursive gate (2/3).
     @Test
     fun andTest() = with(simulator) {
         loadChip("And")
@@ -53,7 +53,7 @@ class IntegrationTests {
         assertEquals(listOf(true), getOutput("out"))
     }
 
-    // Test of a small, non-recursive gate (3/3).
+    // Test of a simple non-recursive gate (3/3).
     @Test
     fun orTest() = with(simulator) {
         loadChip("Or")
@@ -76,7 +76,7 @@ class IntegrationTests {
     }
 
     // Test of the 3-way nand gate.
-// It's part of the DFF, and no solution is provided as part of Nand2Tetris.
+    // It's part of the DFF, and no solution is provided as part of Nand2Tetris.
     @Test
     fun nand3WayTest() = with(simulator) {
         loadChip("Nand3Way")
@@ -122,7 +122,7 @@ class IntegrationTests {
         assertEquals(listOf(false), getOutput("out"))
     }
 
-    // Test of a small recursive gate.
+    // Test of a simple recursive gate.
     @Test
     fun dffTest() = with(simulator) {
         loadChip("DFF")
@@ -165,7 +165,7 @@ class IntegrationTests {
         assertEquals(listOf(false), getOutput("out"))
     }
 
-    // Test of a gate with wide inputs and outputs.
+    // Test of a simple gate with wide inputs/outputs.
     @Test
     fun not16Test() = with(simulator) {
         loadChip("Not16")
@@ -178,5 +178,13 @@ class IntegrationTests {
 
         setInput("in", (0..7).flatMap { listOf(true, false) })
         assertEquals((0..7).flatMap { listOf(false, true) }, getOutput("out"))
+    }
+
+    // Test of a more complex gate with wide inputs/outputs.
+    @Test
+    fun mux8Way16Test() = with(simulator) {
+        loadChip("Mux8Way16")
+
+        // TODO: Set inputs and test conditions.
     }
 }
